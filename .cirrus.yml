@@ -21,7 +21,8 @@ build_task:
     DEPLOY_PULL_REQUEST: "true"
   build_script:
     - source cirrus-env BUILD
-    - regular_build_...
+    - ./gradlew build
+    - echo "TODO: Building, analyzing and deploying artifacts..."
 
 promote_task:
   depends_on:
@@ -33,5 +34,5 @@ promote_task:
   env:
     ARTIFACTORY_PROMOTE_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promoter access_token]
     GITHUB_TOKEN: VAULT[development/github/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promotion token]
-    ARTIFACTS: FIXME # This was for Burgr links, is it still required?
-  script: cirrus_promote_...
+  script:
+    - echo "TODO: Promoting artifacts..."
