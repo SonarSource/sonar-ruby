@@ -152,7 +152,7 @@ ws_scan_task:
     ws_artifacts:
       path: "whitesource/**/*"
 
-### Promote tasks
+### Promote task
 
 promote_task:
   depends_on:
