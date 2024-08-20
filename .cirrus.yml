@@ -36,6 +36,12 @@ linux_4_cpu_6G_java_17_template: &LINUX_4_CPU_6G_JAVA_17
     cpu: 4
     memory: 6G
 
+eks_container: &CONTAINER_DEFINITION
+  image: ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j17-g7-latest
+  cluster_name: ${CIRRUS_CLUSTER_NAME}
+  region: eu-central-1
+  namespace: default
+
 
 ## Build tasks
 
@@ -155,7 +161,9 @@ promote_task:
     - qa_ruling
   <<: *ONLY_IF_SONARSOURCE_QA
   eks_container:
-    <<: *LINUX_2_CPU_4G
+    <<: *CONTAINER_DEFINITION
+    cpu: 1
+    memory: 1G
   env:
     ARTIFACTORY_PROMOTE_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promoter access_token]
     GITHUB_TOKEN: VAULT[development/github/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promotion token]
