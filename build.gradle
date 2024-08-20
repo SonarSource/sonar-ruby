@@ -152,7 +152,7 @@ subprojects {
     // license updater
     spotless {
         java {
-            targetExclude "**/src/test/resources/**", "**/build/**", "its/sources/**", "its/plugin/projects/**", "private/its/sources/**", "private/its/plugin/projects/**"
+            targetExclude "**/src/test/resources/**", "**/build/**", "its/sources/**", "its/plugin/projects/**"
 
             if (getPath().startsWith(':private')) {
                 licenseHeaderFile(rootProject.file("private/LICENSE")).updateYearWithLatest(true)
