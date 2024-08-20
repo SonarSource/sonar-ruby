@@ -42,7 +42,6 @@ eks_container: &CONTAINER_DEFINITION
   region: eu-central-1
   namespace: default
 
-
 ## Build tasks
 
 setup_gradle_cache_template: &SETUP_GRADLE_CACHE
