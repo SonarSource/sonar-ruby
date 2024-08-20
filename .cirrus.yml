@@ -25,7 +25,6 @@ linux_2_cpu_4G_template: &LINUX_2_CPU_4G
 linux_4_cpu_6G_java_17_template: &LINUX_4_CPU_6G_JAVA_17
   eks_container:
     <<: *LINUX_IMAGE
-    image: ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j17-g7-latest
     cpu: 4
     memory: 6G
 
