@@ -6,7 +6,6 @@ env:
   ARTIFACTORY_PRIVATE_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
   ARTIFACTORY_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-private-reader access_token]
 
-  GIT_SUB_MODULE: ""
   GRADLE_USER_HOME: ${CIRRUS_WORKING_DIR}/.gradle
 
 linux_image_template: &LINUX_IMAGE
@@ -77,10 +76,6 @@ qa_task_filter_template: &QA_TASK_FILTER
 gradle_its_template: &GRADLE_ITS_TEMPLATE
   <<: *SETUP_GRADLE_CACHE
   run_its_script:
-    - |
-      if [ -n "${GIT_SUB_MODULE}" ]; then        
-        git submodule update --init --depth 1 "${GIT_SUB_MODULE}"
-      fi
     - source cirrus-env QA
     - # todo fix by removing the build
     - ./gradlew build -x test
@@ -112,6 +107,8 @@ qa_ruling_task:
     ITS_PROJECT: "ruling"
     GIT_SUB_MODULE: "its/sources"
   <<: *LINUX_4_CPU_6G_JAVA_17
+  update_test_sources_script:
+    - git submodule update --init --depth 1 "its/sources"
   <<: *GRADLE_ITS_TEMPLATE
 
 
