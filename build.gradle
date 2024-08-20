@@ -154,11 +154,8 @@ subprojects {
         java {
             targetExclude "**/src/test/resources/**", "**/build/**", "its/sources/**", "its/plugin/projects/**"
 
-            if (getPath().startsWith(':private')) {
-                licenseHeaderFile(rootProject.file("private/LICENSE")).updateYearWithLatest(true)
-            } else {
-                licenseHeaderFile(rootProject.file("LICENSE_HEADER")).updateYearWithLatest(true)
-            }
+            licenseHeaderFile(rootProject.file("LICENSE_HEADER")).updateYearWithLatest(true)
+
         }
     }
 
