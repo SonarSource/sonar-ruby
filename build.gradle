@@ -49,11 +49,6 @@ allprojects {
         version = version.replace('-SNAPSHOT', versionSuffix)
     }
 
-    File extraProperties = new File(rootDir, 'private/extraProperties.gradle')
-    if (extraProperties.exists()) {
-        apply from: extraProperties
-    }
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -119,7 +114,7 @@ subprojects {
         testCompile.extendsFrom compileOnly
     }
 
-    if (!project.path.startsWith(":its") && !project.path.startsWith(":private:its")) {
+    if (!project.path.startsWith(":its")) {
         test {
             useJUnitPlatform()
         }
@@ -128,7 +123,8 @@ subprojects {
     test {
         testLogging {
             exceptionFormat 'full' // log the full stack trace (default is the 1st line of the stack trace)
-            events "skipped", "failed" // verbose log for failed and skipped tests (by default the name of the tests are not logged)
+            events "skipped", "failed"
+            // verbose log for failed and skipped tests (by default the name of the tests are not logged)
         }
         def propKeys = System.properties.findAll {
             it.key.startsWith("orchestrator") || it.key.startsWith("sonar") || it.key == "buildNumber" || it.key == "slangVersion"
@@ -199,7 +195,7 @@ subprojects {
         required {
             def branch = System.getenv()["CIRRUS_BRANCH"]
             return (branch == 'master' || branch ==~ 'branch-[\\d.]+') &&
-                    gradle.taskGraph.hasTask(":artifactoryPublish")
+              gradle.taskGraph.hasTask(":artifactoryPublish")
         }
         sign publishing.publications
     }
@@ -208,8 +204,8 @@ subprojects {
         onlyIf {
             def branch = System.getenv()["CIRRUS_BRANCH"]
             return !artifactoryPublish.skip &&
-                    (branch == 'master' || branch ==~ 'branch-[\\d.]+') &&
-                    gradle.taskGraph.hasTask(":artifactoryPublish")
+              (branch == 'master' || branch ==~ 'branch-[\\d.]+') &&
+              gradle.taskGraph.hasTask(":artifactoryPublish")
         }
     }
 }
@@ -236,13 +232,13 @@ artifactory {
         }
         defaults {
             properties = [
-                'build.name': 'sonar-ruby',
-                'build.number': System.getenv('BUILD_NUMBER'),
-                'pr.branch.target': System.getenv('PULL_REQUEST_BRANCH_TARGET'),
-                'pr.number': System.getenv('PULL_REQUEST_NUMBER'),
-                'vcs.branch': System.getenv('GIT_BRANCH'),
-                'vcs.revision': System.getenv('GIT_COMMIT'),
-                'version': version
+              'build.name'      : 'sonar-ruby',
+              'build.number'    : System.getenv('BUILD_NUMBER'),
+              'pr.branch.target': System.getenv('PULL_REQUEST_BRANCH_TARGET'),
+              'pr.number'       : System.getenv('PULL_REQUEST_NUMBER'),
+              'vcs.branch'      : System.getenv('GIT_BRANCH'),
+              'vcs.revision'    : System.getenv('GIT_COMMIT'),
+              'version'         : version
             ]
             publications('mavenJava')
             publishPom = true
@@ -261,7 +257,7 @@ artifactory {
 
 void enforceJarSizeAndCheckContent(File file, long minSize, long maxSize) {
     long size = file.length()
-    if (size < minSize)  {
+    if (size < minSize) {
         throw new GradleException("${file.path} size ($size) too small. Min is $minSize")
     } else if (size > maxSize) {
         throw new GradleException("${file.path} size ($size) too large. Max is $maxSize")
