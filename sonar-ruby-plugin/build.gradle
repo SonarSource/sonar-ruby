@@ -25,9 +25,9 @@ plugins {
 import com.github.jrubygradle.JRubyPrepare
 
 ext {
-    rubygemsRaccVersion = '1.5.2-java'
+    rubygemsRaccVersion = '1.8.1-java'
     rubygemsAstVersion = '2.4.2'
-    rubygemsParserVersion = '3.2.2.3'
+    rubygemsParserVersion = '3.3.4.2'
 }
 
 
