@@ -1,8 +1,8 @@
 # sonar-ruby
 
-[![Build Status](https://api.cirrus-ci.com/github/SonarSource/slang.svg?branch=master)](https://cirrus-ci.com/github/SonarSource/slang)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=org.sonarsource.slang%3Aslang&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.sonarsource.slang%3Aslang)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=org.sonarsource.slang%3Aslang&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=org.sonarsource.slang%3Aslang)
+[![Build Status](https://api.cirrus-ci.com/github/SonarSource/slang.svg?branch=master)](https://cirrus-ci.com/github/SonarSource/sonar-ruby)
+[![Quality Gate Status](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-ruby&metric=alert_status&token=sqb_a78a1551add08b844fb442b01edcb5cc144ed1cb)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-ruby)
+[![Coverage](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-ruby&metric=coverage&token=sqb_a78a1551add08b844fb442b01edcb5cc144ed1cb)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-ruby)
 
 This is a developer documentation. If you want to analyze source code in SonarQube read the [analysis of Ruby documentation](https://docs.sonarqube.org/latest/analysis/languages/ruby/).
 
