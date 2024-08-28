@@ -135,9 +135,9 @@ class SimpleCovSensorTest {
 
     String file1Key = MODULE_KEY + ":file1.rb";
     assertThat(context.lineHits(file1Key, 1)).isZero();
-    assertThat(context.lineHits(file1Key, 2)).isZero();
+    assertThat(context.lineHits(file1Key, 2)).isNull();
     assertThat(context.lineHits(file1Key, 3)).isEqualTo(1);
-    assertThat(context.lineHits(file1Key, 4)).isZero();
+    assertThat(context.lineHits(file1Key, 4)).isNull();
     assertThat(context.lineHits(file1Key, 5)).isNull();
     assertThat(context.lineHits(file1Key, 6)).isEqualTo(1);
     assertThat(context.lineHits(file1Key, 7)).isEqualTo(1);
@@ -155,9 +155,9 @@ class SimpleCovSensorTest {
 
     String file1Key = MODULE_KEY + ":file1.rb";
     assertThat(context.lineHits(file1Key, 1)).isZero();
-    assertThat(context.lineHits(file1Key, 2)).isZero();
+    assertThat(context.lineHits(file1Key, 2)).isNull();
     assertThat(context.lineHits(file1Key, 3)).isEqualTo(1);
-    assertThat(context.lineHits(file1Key, 4)).isZero();
+    assertThat(context.lineHits(file1Key, 4)).isNull();
     assertThat(context.lineHits(file1Key, 5)).isNull();
     assertThat(context.lineHits(file1Key, 6)).isEqualTo(1);
     assertThat(context.lineHits(file1Key, 7)).isEqualTo(1);
@@ -166,6 +166,17 @@ class SimpleCovSensorTest {
 
     String file2Key = MODULE_KEY + ":file2.rb";
     assertThat(context.lineHits(file2Key, 1)).isEqualTo(3);
+  }
+
+  @Test
+  void test_mergeHitsForLine() {
+    assertThat(SimpleCovSensor.mergeHitsForLine(1, 2)).isEqualTo(3);
+    assertThat(SimpleCovSensor.mergeHitsForLine(2, 1)).isEqualTo(3);
+    assertThat(SimpleCovSensor.mergeHitsForLine(0, 0)).isZero();
+    assertThat(SimpleCovSensor.mergeHitsForLine(null, 0)).isNull();
+    assertThat(SimpleCovSensor.mergeHitsForLine(0, null)).isNull();
+    assertThat(SimpleCovSensor.mergeHitsForLine(null, 1)).isEqualTo(1);
+    assertThat(SimpleCovSensor.mergeHitsForLine(1, null)).isEqualTo(1);
   }
 
   @Test
