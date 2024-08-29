@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FilePredicates;
@@ -107,7 +108,9 @@ public class SimpleCovSensor implements Sensor {
   private static void saveNewCoverage(SensorContext context, Map<Integer, Integer> hitsPerLines, InputFile inputFile) {
     NewCoverage newCoverage = context.newCoverage().onFile(inputFile);
     for (Entry<Integer, Integer> hitsPerLine : hitsPerLines.entrySet()) {
-      newCoverage.lineHits(hitsPerLine.getKey(), hitsPerLine.getValue());
+      if (hitsPerLine.getValue() != null) {
+        newCoverage.lineHits(hitsPerLine.getKey(), hitsPerLine.getValue());
+      }
     }
     newCoverage.save();
   }
@@ -140,13 +143,38 @@ public class SimpleCovSensor implements Sensor {
     Map<Integer, Integer> fileCoverage = coveragePerFiles.computeIfAbsent(currentFile, key -> new HashMap<>());
     for (int i = 0; i < hitsPerLine.size(); i++) {
       Object hits = hitsPerLine.get(i);
+      int line = i + 1;
+      Integer currentHits = fileCoverage.getOrDefault(line, 0);
       // Hits can be a Long (coverage data available), null or "ignored".
       if (hits instanceof Long) {
-        int line = i + 1;
-        Integer currentHits = fileCoverage.getOrDefault(line, 0);
-        fileCoverage.put(line, currentHits + ((Long) hits).intValue());
+        fileCoverage.put(line, mergeHitsForLine(((Long) hits).intValue(), currentHits));
+      } else if (hits == null) {
+        fileCoverage.put(line, mergeHitsForLine(null, currentHits));
       }
     }
+  }
+
+  /*
+   * A re-implementation of merging logic implemented by simplecov.
+   * See https://github.com/simplecov-ruby/simplecov/blob/0e35b257e24381e4ec2c99b321954509ae21eaf0/lib/simplecov/combine/lines_combiner.rb#L20-L40
+   *
+   * VisibleForTesting
+   */
+  @CheckForNull
+  static Integer mergeHitsForLine(@Nullable Integer first, @Nullable Integer second) {
+    if (first == null) {
+      if (second == null || second == 0) {
+        return null;
+      }
+      return second;
+    }
+    if (second == null) {
+      if (first == 0) {
+        return null;
+      }
+      return first;
+    }
+    return first + second;
   }
 
   private static Map<Path, String> getReportFilesAndContents(SensorContext context) throws IOException {
