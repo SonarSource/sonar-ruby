@@ -143,15 +143,13 @@ public class SimpleCovSensor implements Sensor {
     Map<Integer, Integer> fileCoverage = coveragePerFiles.computeIfAbsent(currentFile, key -> new HashMap<>());
     for (int i = 0; i < hitsPerLine.size(); i++) {
       Object hits = hitsPerLine.get(i);
+      int line = i + 1;
+      Integer currentHits = fileCoverage.getOrDefault(line, 0);
       // Hits can be a Long (coverage data available), null or "ignored".
-      if (hits == null || hits instanceof Long) {
-        int line = i + 1;
-        Integer currentHits = fileCoverage.getOrDefault(line, 0);
-        Integer mergedHits = hits == null ?
-          mergeHitsForLine(null, currentHits) :
-          mergeHitsForLine(((Long) hits).intValue(), currentHits);
-        fileCoverage.put(line, mergedHits);
-
+      if (hits instanceof Long) {
+        fileCoverage.put(line, mergeHitsForLine(((Long) hits).intValue(), currentHits));
+      } else if (hits == null) {
+        fileCoverage.put(line, mergeHitsForLine(null, currentHits));
       }
     }
   }
