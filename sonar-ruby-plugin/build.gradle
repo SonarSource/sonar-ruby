@@ -35,13 +35,12 @@ processResources.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 processResources.from("src/main/resources", "${buildDir}/dependency_gems/gems")
 
 dependencies {
-    compileOnly 'org.sonarsource.api.plugin:sonar-plugin-api'
-    testImplementation 'org.sonarsource.sonarqube:sonar-plugin-api-impl'
-    testImplementation 'org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures'
-    implementation 'org.sonarsource.analyzer-commons:sonar-analyzer-commons'
-    implementation 'org.sonarsource.slang:slang-plugin'
-    implementation 'org.sonarsource.slang:slang-checks'
-    implementation 'org.sonarsource.slang:slang-api'
+    compileOnly libs.sonar.plugin.api
+
+    implementation libs.sonar.analyzer.commons
+    implementation libs.slang.plugin
+    implementation libs.slang.checks
+    implementation libs.slang.api
     implementation project(path: ':jruby-repackaged', configuration: 'shadow')
     // The plugin "com.github.jruby-gradle.jar" is broken and not anymore maintained.
     // For example, given the following definition:
@@ -53,13 +52,17 @@ dependencies {
     gems files("${buildDir}/rubygems_downloads/racc-${rubygemsRaccVersion}.gem")
     gems files("${buildDir}/rubygems_downloads/ast-${rubygemsAstVersion}.gem")
     gems files("${buildDir}/rubygems_downloads/parser-${rubygemsParserVersion}.gem")
-    testImplementation 'org.sonarsource.slang:slang-testing'
-    testImplementation 'org.sonarsource.slang:slang-antlr'
-    testImplementation "org.junit.jupiter:junit-jupiter-api"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
-    testImplementation 'org.assertj:assertj-core'
-    testImplementation 'org.mockito:mockito-core'
-    testImplementation 'io.github.classgraph:classgraph'
+
+    testImplementation testLibs.slang.antlr
+    testImplementation testLibs.assertj.core
+    testImplementation testLibs.mockito.core
+    testImplementation testLibs.classgraph
+    testImplementation testLibs.slang.testing
+    testImplementation testLibs.junit.jupiter.api
+    testImplementation testLibs.sonar.plugin.api.impl
+    testImplementation testLibs.sonar.plugin.api.test.fixtures
+
+    testRuntimeOnly testLibs.junit.jupiter.engine
 }
 
 task downloadFromRubygems(type: Task) {
