@@ -87,8 +87,6 @@ public class SonarLintTest {
       });
     StandaloneGlobalConfiguration configuration = sonarLintConfigBuilder
       .addEnabledLanguage(Language.RUBY)
-      .addEnabledLanguage(Language.SCALA)
-      .addEnabledLanguage(Language.GO)
       .build();
     sonarlintEngine = new StandaloneSonarLintEngineImpl(configuration);
     baseDir = temp.newFolder();
@@ -199,7 +197,7 @@ public class SonarLintTest {
       @NotNull
       @Override
       public Language language() {
-        return Language.forKey(language).orElse(Language.APEX);
+        return Language.RUBY;
       }
     };
   }

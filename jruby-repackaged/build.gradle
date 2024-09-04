@@ -1,9 +1,9 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '4.0.2'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
 }
 
 ext {
-    jrubyVersion = '9.3.15.0'
+    jrubyVersion = '9.4.7.0'
 }
 
 dependencies {
