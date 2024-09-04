@@ -4,7 +4,6 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'com.jfrog.artifactory' version '4.28.2'
-    id 'io.spring.dependency-management' version '1.0.6.RELEASE' apply false
     id 'org.sonarqube' version '3.5.0.2730'
     id 'de.thetaphi.forbiddenapis' version '3.0' apply false
     id 'com.diffplug.spotless' version '6.15.0'
@@ -13,7 +12,6 @@ plugins {
 allprojects {
     apply plugin: 'java'
     apply plugin: 'jacoco'
-    apply plugin: 'io.spring.dependency-management'
     apply plugin: 'com.jfrog.artifactory'
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
@@ -66,7 +64,6 @@ subprojects {
     // do not publish to Artifactory by default
     artifactoryPublish.skip = true
 
-    apply plugin: 'io.spring.dependency-management'
     apply plugin: 'com.diffplug.spotless'
 
     java.sourceCompatibility = JavaVersion.VERSION_11
