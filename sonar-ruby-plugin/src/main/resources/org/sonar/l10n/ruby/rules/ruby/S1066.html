@@ -1,31 +1,41 @@
 <h2>Why is this an issue?</h2>
-<p>Merging collapsible <code>if</code> statements increases the code’s readability.</p>
-<h3>Noncompliant code example</h3>
+<p>Nested code - blocks of code inside blocks of code - is eventually necessary, but increases complexity. This is why keeping the code as flat as
+possible, by avoiding unnecessary nesting, is considered a good practice.</p>
+<p>Merging <code>if</code> statements when possible will decrease the nesting of the code and improve its readability.</p>
+<p>Code like</p>
 <pre>
-if !filename.nil?
-  if File.file?(filename) || File.directory?(filename)
-    # ...
-  end
-end
-
 if a then
-  unless b then
+  unless b then  # Noncompliant
     # ...
   end
 end
 </pre>
-<h3>Compliant solution</h3>
+<p>Will be more readable as</p>
+<pre>
+if a &amp;&amp; !b then  # Compliant
+  # ...
+end
+</pre>
+<h2>How to fix it</h2>
+<p>If merging the conditions seems to result in a more complex code, extracting the condition or part of it in a named function or variable is a
+better approach to fix readability.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre>
+if !filename.nil?
+  if File.file?(filename) || File.directory?(filename) # Noncompliant
+    # ...
+  end
+end
+</pre>
+<h4>Compliant solution</h4>
 <pre>
 def isFileOrDirectory(filename)
   File.file?(filename) || File.directory?(filename)
 end
 # ...
 
-if !filename.nil? &amp;&amp; isFileOrDirectory(filename)
-  # ...
-end
-
-if a &amp;&amp; !b then
+if !filename.nil? &amp;&amp; isFileOrDirectory(filename)       # Compliant
   # ...
 end
 </pre>
