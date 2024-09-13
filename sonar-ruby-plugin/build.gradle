@@ -13,7 +13,7 @@ buildscript{
     dependencies {
         // The JRuby plugin requires grolifant version 0.12. This has become unavailable,
         // however, we can substitute it with version 0.12.1.
-        classpath('org.ysb33r.gradle:grolifant:0.12.1')
+        classpath('org.ysb33r.gradle:grolifant:0.17.0')
     }
 }
 
@@ -29,7 +29,6 @@ ext {
     rubygemsAstVersion = '2.4.2'
     rubygemsParserVersion = '3.3.4.2'
 }
-
 
 processResources.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 processResources.from("src/main/resources", "${buildDir}/dependency_gems/gems")
