@@ -3,7 +3,7 @@ plugins {
 }
 
 ext {
-    jrubyVersion = '9.4.7.0'
+    jrubyVersion = '9.4.8.0'
 }
 
 dependencies {
