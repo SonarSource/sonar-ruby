@@ -94,6 +94,48 @@ unpackDependencyGems.dependsOn downloadFromRubygems
 copyGemsJarsFromDirectoryToShadowBugWorkaroundJar.dependsOn unpackDependencyGems
 processResources.dependsOn copyGemsJarsFromDirectoryToShadowBugWorkaroundJar
 
+tasks.register('checkRubyLicenseHeader') {
+    // This task facilitates a rudimentary check of the license header in Ruby files.
+    // If the license header is missing or outdated, the task will fail. It will not check that the correct license is used in the header.
+
+    doLast {
+        def rubyFiles = fileTree(dir: project.projectDir, include: 'src/main/**/*.rb')
+        def currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        def filesWithOutdatedOrInvalidHeader = []
+
+        rubyFiles.each { file ->
+            def matcher = file.text =~ /Copyright \(C\) \d{4}-(\d{4}) SonarSource/
+            if (!matcher || matcher[0][1] != currentYear.toString()) {
+                filesWithOutdatedOrInvalidHeader << file
+            }
+        }
+
+        if (!filesWithOutdatedOrInvalidHeader.isEmpty()) {
+            throw new GradleException(
+                    "License header is invalid or outdated in the following files: ${filesWithOutdatedOrInvalidHeader.join(', ')}")
+        }
+    }
+}
+
+tasks.register('updateRubyLicenseHeader') {
+    // This task is used to update the dates in existing license headers in Ruby files. It does not add a license header if it is missing.
+
+    doLast {
+        def rubyFiles = fileTree(dir: project.projectDir, include: 'src/main/**/*.rb')
+        // Replace the year range in the license header using regex to make sure it ends in the current year
+        def currentYear = Calendar.getInstance().get(Calendar.YEAR)
+
+        rubyFiles.each { file ->
+            file.write file.text.replaceFirst(/(Copyright \(C\) \d{4}-)\d{4}/, {
+                return "${it[1]}${currentYear}"
+            })
+        }
+    }
+}
+
+tasks.spotlessApply.dependsOn updateRubyLicenseHeader
+tasks.spotlessCheck.dependsOn checkRubyLicenseHeader
+
 jar {
     manifest {
         def displayVersion = (project.buildNumber == null ? project.version : project.version.substring(0, project.version.lastIndexOf('.')) + " (build ${project.buildNumber})")
