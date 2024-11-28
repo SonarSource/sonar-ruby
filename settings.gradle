@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    def slangDependenciesVersion = '1.16.1.6262'
+    def slangDependenciesVersion = '1.17.0.6351'
     def analyzerCommonsVersion = '2.16.0.3141'
     def pluginApiVersion = '10.10.0.2391'
     def sonarqubeVersion = '10.0.0.68432'
@@ -34,10 +34,12 @@ dependencyResolutionManagement {
             library("sonar-ws", "org.sonarsource.sonarqube", "sonar-ws").version(sonarqubeVersion)
             library("slang-antlr", "org.sonarsource.slang", "slang-antlr").version(slangDependenciesVersion)
             library("slang-testing", "org.sonarsource.slang", "slang-testing").version(slangDependenciesVersion)
-            library("mockito-core", "org.mockito", "mockito-core").version("5.13.0")
+            library("mockito-core", "org.mockito", "mockito-core").version("5.14.2")
             library("assertj-core", "org.assertj", "assertj-core").version("3.26.3")
-            library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("5.11.0")
-            library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("5.11.0")
+            library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("5.11.3")
+            library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("5.11.3")
+            library("junit", "junit", "junit").version("4.13.2")
+            //testImplementation group: 'junit', name: 'junit', version: '4.13.2'
         }
     }
 }
