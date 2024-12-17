@@ -3,17 +3,22 @@ buildscript{
     repositories {
         mavenLocal()
         mavenCentral()
-
-        // The Apache Archiva is required to get the com.burgstaller:okhttp-digest:1.10
-        // dependency required by the JRuby plugin. The dependency is not on maven central.
-        maven {
-            url "https://archiva-repository.apache.org/archiva/repository/public"
-        }
     }
     dependencies {
         // The JRuby plugin requires grolifant version 0.12. This has become unavailable,
         // however, we can substitute it with version 0.12.1.
         classpath('org.ysb33r.gradle:grolifant:0.17.0')
+    }
+
+    // Workaround for missing transitive dependency on okhttp-digest-1.10.
+    // https://github.com/rburgst/okhttp-digest/issues/86#issuecomment-2240821581
+    configurations.classpath {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'com.burgstaller' && details.requested.name == 'okhttp-digest' && details.requested.version == '1.10') {
+                details.useTarget "io.github.rburgst:${details.requested.name}:1.21"
+                details.because 'Dependency has moved'
+            }
+        }
     }
 }
 
