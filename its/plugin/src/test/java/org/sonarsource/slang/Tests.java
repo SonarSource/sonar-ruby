@@ -16,15 +16,12 @@
  */
 package org.sonarsource.slang;
 
-import com.sonar.orchestrator.Orchestrator;
-import com.sonar.orchestrator.OrchestratorBuilder;
+import com.sonar.orchestrator.junit4.OrchestratorRule;
+import com.sonar.orchestrator.junit4.OrchestratorRuleBuilder;
 import com.sonar.orchestrator.locator.FileLocation;
 import com.sonar.orchestrator.locator.Location;
 import com.sonar.orchestrator.locator.MavenLocation;
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
@@ -44,10 +41,10 @@ public class Tests {
   static final String DEFAULT_SQ_VERSION = "LATEST_RELEASE";
 
   @ClassRule
-  public static final Orchestrator ORCHESTRATOR;
+  public static final OrchestratorRule ORCHESTRATOR;
 
   static {
-    OrchestratorBuilder orchestratorBuilder = Orchestrator.builderEnv();
+    OrchestratorRuleBuilder orchestratorBuilder = OrchestratorRule.builderEnv();
     addRubyPlugin(orchestratorBuilder);
     ORCHESTRATOR = orchestratorBuilder
       .useDefaultAdminCredentialsForBuilds(true)
@@ -56,7 +53,7 @@ public class Tests {
       .build();
   }
 
-  static void addRubyPlugin(OrchestratorBuilder builder) {
+  static void addRubyPlugin(OrchestratorRuleBuilder builder) {
     String slangVersion = System.getProperty("slangVersion");
 
     Location pluginLocation;
