@@ -11,6 +11,9 @@ env:
   ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
   ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
 
+  DEVELOCITY_TOKEN: VAULT[development/kv/data/develocity data.token]
+  DEVELOCITY_ACCESS_KEY: develocity.sonar.build=${DEVELOCITY_TOKEN}
+
   GRADLE_USER_HOME: ${CIRRUS_WORKING_DIR}/.gradle
 
 linux_image_template: &LINUX_IMAGE
@@ -38,6 +41,9 @@ eks_container: &CONTAINER_DEFINITION
   region: eu-central-1
   namespace: default
 
+log_develocity_url_script: &log_develocity_url_script |
+  echo "Develocity URL: https://develocity.sonar.build/scans?search.publicHostnames=cirrus-ci-task-${CIRRUS_TASK_ID}"
+
 ## Build tasks
 
 setup_gradle_cache_template: &SETUP_GRADLE_CACHE
@@ -64,6 +70,7 @@ build_task:
     ORG_GRADLE_PROJECT_signingPassword: VAULT[development/kv/data/sign data.passphrase]
     ORG_GRADLE_PROJECT_signingKeyId: VAULT[development/kv/data/sign data.key_id]
   build_script:
+    - *log_develocity_url_script
     - source cirrus-env BUILD
     - function gradle(){ ./gradlew "$@"; }; export -f gradle
     - gradle --version
@@ -90,6 +97,7 @@ qa_task_filter_template: &QA_TASK_FILTER
 gradle_its_template: &GRADLE_ITS_TEMPLATE
   <<: *SETUP_GRADLE_CACHE
   run_its_script:
+    - *log_develocity_url_script
     - source cirrus-env QA
     - ./gradlew "${GRADLE_TASK}" "-P${ITS_PROJECT}"
       "-Dsonar.runtimeVersion=${SQ_VERSION}"
@@ -140,6 +148,7 @@ ws_scan_task:
   maven_cache:
     folder: ${CIRRUS_WORKING_DIR}/.m2/repository
   whitesource_script:
+    - *log_develocity_url_script
     - source cirrus-env QA
     - ./gradlew --no-daemon --console plain clean
     - ./gradlew --no-daemon --info --stacktrace --console plain --no-daemon build -x test
@@ -166,5 +175,6 @@ promote_task:
     ARTIFACTORY_PROMOTE_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promoter access_token]
     GITHUB_TOKEN: VAULT[development/github/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promotion token]
   promote_script:
+    - *log_develocity_url_script
     - function gradle(){ ./gradlew "$@"; }; export -f gradle
     - cirrus_promote_gradle multi
