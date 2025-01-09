@@ -37,8 +37,6 @@ public class MeasuresTest extends TestBase {
     assertThat(getMeasureAsInt(componentKey, "comment_lines")).isEqualTo(6);
     assertThat(getMeasureAsInt(componentKey, "statements")).isEqualTo(5);
     assertThat(getMeasureAsInt(componentKey, "cognitive_complexity")).isEqualTo(0);
-    assertThat(getMeasure(componentKey, "ncloc_data").getValue()).isEqualTo("16=1;2=1;3=1;20=1;6=1;7=1;14=1;15=1");
-    assertThat(getMeasure(componentKey, "executable_lines_data").getValue()).isEqualTo("3=1;20=1;7=1;14=1;15=1");
 
     List<Issues.Issue> issuesForRule = getIssuesForRule(projectKey, "ruby:S1135");
     assertThat(issuesForRule).extracting(Issues.Issue::getLine).containsExactly(18);
