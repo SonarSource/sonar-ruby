@@ -74,3 +74,12 @@ def nested_inside()
         nested_not_used = 2 # Noncompliant
     end
 end
+
+def with_case_statement
+     x = 9000 # Compliant, used below
+
+    case 4
+    when 1, 4
+       return x
+    end
+end

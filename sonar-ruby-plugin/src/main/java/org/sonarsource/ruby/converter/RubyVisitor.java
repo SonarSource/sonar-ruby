@@ -556,11 +556,16 @@ public class RubyVisitor {
   }
 
   private Tree createCaseTree(AstNode node, List<?> children) {
-    Tree expression = ((Tree) children.get(0));
-    Tree body = ((Tree) children.get(1));
+    int bodyIndex = children.size() - 1;
+
+    var expressionItems = children.subList(0, bodyIndex);
+    Tree expression = createNativeTree(node, expressionItems);
+
+    Tree body = (Tree) children.get(bodyIndex);
     if (body == null) {
       body = new BlockTreeImpl(metaData(node), Collections.emptyList());
     }
+
     return new MatchCaseTreeImpl(metaData(node), expression, body);
   }
 
