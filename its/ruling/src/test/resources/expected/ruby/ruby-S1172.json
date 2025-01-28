@@ -80,9 +80,6 @@
 'ruby-project:sources/ruby/rails/actionpack/test/dispatch/session/abstract_store_test.rb':[
 52,
 ],
-'ruby-project:sources/ruby/rails/actionview/lib/action_view/helpers/form_helper.rb':[
-1550,
-],
 'ruby-project:sources/ruby/rails/actionview/lib/action_view/helpers/number_helper.rb':[
 427,
 ],
@@ -181,9 +178,6 @@
 712,
 743,
 743,
-],
-'ruby-project:sources/ruby/rails/activerecord/lib/active_record/relation/where_clause.rb':[
-137,
 ],
 'ruby-project:sources/ruby/rails/activerecord/lib/active_record/schema_dumper.rb':[
 92,

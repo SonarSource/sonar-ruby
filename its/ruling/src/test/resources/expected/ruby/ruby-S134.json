@@ -36,6 +36,9 @@
 686,
 993,
 ],
+'ruby-project:sources/ruby/rails/activerecord/lib/active_record/relation/predicate_builder.rb':[
+81,
+],
 'ruby-project:sources/ruby/rails/activerecord/test/cases/transactions_test.rb':[
 493,
 ],
