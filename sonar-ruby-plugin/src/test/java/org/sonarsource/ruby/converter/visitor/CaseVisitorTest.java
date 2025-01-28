@@ -91,4 +91,51 @@ class CaseVisitorTest extends AbstractRubyConverterTest {
     assertThat(tree.cases().get(1).body()).isNotNull();
   }
 
+  @Test
+  void case_when_multiple() {
+    MatchTree tree = (MatchTree) rubyStatement(
+            "case x\n " +
+            "when 1, 7\n " +
+            "  doSomething()\n" +
+            "  doManyThings()\n" +
+            "else doSomethingElse()\n" +
+            "end");
+
+    assertThat(tree.keyword().text()).isEqualTo("case");
+    assertTree(tree.expression()).isEquivalentTo(sendToIdentifier("x"));
+    assertThat(tree.cases()).hasSize(2);
+    MatchCaseTree matchCase0 = tree.cases().get(0);
+    assertThat(matchCase0.expression()).isNotNull();
+    assertTree(matchCase0.body()).isBlock(NativeTree.class, NativeTree.class);
+    assertTree(matchCase0.body()).hasTextRange(3, 3, 4, 16);
+    assertRange(matchCase0.rangeToHighlight()).hasRange(2, 1, 2, 10);
+
+    MatchCaseTree elseMatchCase = tree.cases().get(1);
+    assertThat(elseMatchCase.expression()).isNull();
+    assertThat(elseMatchCase.body()).isNotNull();
+    assertRange(elseMatchCase.rangeToHighlight()).hasRange(5, 0, 5, 4);
+  }
+
+  @Test
+  void case_when_multiple_and_empty_body() {
+    MatchTree tree = (MatchTree) rubyStatement(
+            "case x\n " +
+            "when 1, 7\n " +
+            "else doSomethingElse()\n" +
+            "end");
+
+    assertThat(tree.keyword().text()).isEqualTo("case");
+    assertTree(tree.expression()).isEquivalentTo(sendToIdentifier("x"));
+    assertThat(tree.cases()).hasSize(2);
+    MatchCaseTree matchCase0 = tree.cases().get(0);
+    assertThat(matchCase0.expression()).isNotNull();
+    assertTree(matchCase0.body()).isBlock();
+    assertTree(matchCase0.body()).hasTextRange(2,1,2,10);
+    assertRange(matchCase0.rangeToHighlight()).hasRange(2, 1, 2, 10);
+
+    MatchCaseTree elseMatchCase = tree.cases().get(1);
+    assertThat(elseMatchCase.expression()).isNull();
+    assertThat(elseMatchCase.body()).isNotNull();
+    assertRange(elseMatchCase.rangeToHighlight()).hasRange(3,1,3,5);
+  }
 }
