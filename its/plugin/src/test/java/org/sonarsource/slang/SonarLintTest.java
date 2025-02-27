@@ -1,6 +1,6 @@
 /*
  * SonarSource Ruby
- * Copyright (C) 2018-2024 SonarSource SA
+ * Copyright (C) 2018-2025 SonarSource SA
  * mailto:info AT sonarsource DOT com
  *
  * This program is free software; you can redistribute it and/or
@@ -16,9 +16,10 @@
  */
 package org.sonarsource.slang;
 
-import com.sonar.orchestrator.Orchestrator;
-import com.sonar.orchestrator.OrchestratorBuilder;
+import com.sonar.orchestrator.junit4.OrchestratorRule;
+import com.sonar.orchestrator.junit4.OrchestratorRuleBuilder;
 import com.sonar.orchestrator.locator.Locators;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,9 +64,9 @@ public class SonarLintTest {
   @BeforeClass
   public static void prepare() throws Exception {
     // Orchestrator is used only to retrieve plugin artifacts from filesystem or maven
-    OrchestratorBuilder orchestratorBuilder = Orchestrator.builderEnv();
+    OrchestratorRuleBuilder orchestratorBuilder = OrchestratorRule.builderEnv();
     Tests.addRubyPlugin(orchestratorBuilder);
-    Orchestrator orchestrator = orchestratorBuilder
+    OrchestratorRule orchestrator = orchestratorBuilder
       .useDefaultAdminCredentialsForBuilds(true)
       .setSonarVersion(System.getProperty(Tests.SQ_VERSION_PROPERTY, Tests.DEFAULT_SQ_VERSION))
       .build();
