@@ -35,6 +35,12 @@ linux_4_cpu_6G_java_17_template: &LINUX_4_CPU_6G_JAVA_17
     cpu: 4
     memory: 6G
 
+linux_4_cpu_8G_java_17_template: &LINUX_4_CPU_8G_JAVA_17
+  eks_container:
+    <<: *LINUX_IMAGE
+    cpu: 4
+    memory: 8G
+
 eks_container: &CONTAINER_DEFINITION
   image: ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j17-g7-latest
   cluster_name: ${CIRRUS_CLUSTER_NAME}
@@ -125,7 +131,7 @@ qa_ruling_task:
     GRADLE_TASK: ":its:ruling:test"
     ITS_PROJECT: "ruling"
     GIT_SUB_MODULE: "its/sources"
-  <<: *LINUX_4_CPU_6G_JAVA_17
+  <<: *LINUX_4_CPU_8G_JAVA_17
   update_test_sources_script:
     - git submodule update --init --depth 1 "its/sources"
   <<: *GRADLE_ITS_TEMPLATE
