@@ -116,6 +116,7 @@ public class SlangRulingTest {
 
     File litsDifferencesFile = FileLocation.of("build/" + projectKey + "-differences").getFile();
     SonarScanner build = SonarScanner.create(FileLocation.of("../").getFile())
+      .setProperty("sonar.scanner.skipJreProvisioning", "true")
       .setProjectKey(projectKey)
       .setProjectName(projectKey)
       .setProjectVersion("1")
