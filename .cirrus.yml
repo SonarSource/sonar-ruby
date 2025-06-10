@@ -116,6 +116,7 @@ gradle_its_template: &GRADLE_ITS_TEMPLATE
 qa_plugin_task:
   <<: *QA_TASK_FILTER
   env:
+    GITHUB_TOKEN: VAULT[development/github/token/licenses-ro token]
     ITS_PROJECT: "plugin"
     GRADLE_TASK: ":its:plugin:test"
     matrix:
@@ -127,6 +128,7 @@ qa_plugin_task:
 qa_ruling_task:
   <<: *QA_TASK_FILTER
   env:
+    GITHUB_TOKEN: VAULT[development/github/token/licenses-ro token]
     SQ_VERSION: "LATEST_RELEASE"
     GRADLE_TASK: ":its:ruling:test"
     ITS_PROJECT: "ruling"

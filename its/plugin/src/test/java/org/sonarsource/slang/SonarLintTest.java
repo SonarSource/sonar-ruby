@@ -16,6 +16,7 @@
  */
 package org.sonarsource.slang;
 
+import com.sonar.orchestrator.container.Edition;
 import com.sonar.orchestrator.junit4.OrchestratorRule;
 import com.sonar.orchestrator.junit4.OrchestratorRuleBuilder;
 import com.sonar.orchestrator.locator.Locators;
@@ -68,6 +69,8 @@ public class SonarLintTest {
     Tests.addRubyPlugin(orchestratorBuilder);
     OrchestratorRule orchestrator = orchestratorBuilder
       .useDefaultAdminCredentialsForBuilds(true)
+      .setEdition(Edition.ENTERPRISE_LW)
+      .activateLicense()
       .setSonarVersion(System.getProperty(Tests.SQ_VERSION_PROPERTY, Tests.DEFAULT_SQ_VERSION))
       .build();
 
