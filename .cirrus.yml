@@ -29,12 +29,6 @@ linux_2_cpu_4G_template: &LINUX_2_CPU_4G
     cpu: 2
     memory: 4G
 
-linux_4_cpu_6G_java_17_template: &LINUX_4_CPU_6G_JAVA_17
-  eks_container:
-    <<: *LINUX_IMAGE
-    cpu: 4
-    memory: 6G
-
 linux_4_cpu_8G_java_17_template: &LINUX_4_CPU_8G_JAVA_17
   eks_container:
     <<: *LINUX_IMAGE
@@ -122,7 +116,7 @@ qa_plugin_task:
     matrix:
       - SQ_VERSION: "DEV"
       - SQ_VERSION: "LATEST_RELEASE"
-  <<: *LINUX_4_CPU_6G_JAVA_17
+  <<: *LINUX_4_CPU_8G_JAVA_17
   <<: *GRADLE_ITS_TEMPLATE
 
 qa_ruling_task:
