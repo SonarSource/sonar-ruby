@@ -83,6 +83,33 @@ build_task:
       path: "*.hprof"
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
+sonar_shadow_scan_and_issue_replication_task:
+  depends_on:
+    - build
+  # Only run when triggered by the cirrus-ci cron job named "nightly"
+  only_if: $CIRRUS_CRON == "nightly"
+  <<: *LINUX_2_CPU_4G
+  <<: *SETUP_GRADLE_CACHE
+  env:
+    SONAR_PROJECT_KEY: "SonarSource_sonar-ruby"
+    SHADOW_ORGANIZATION: "sonarsource"
+    SHADOW_PROJECT_KEY: "SonarSource_sonar-ruby"
+    # to replicate issue states from next
+    SONAR_TOKEN: VAULT[development/kv/data/next data.token]
+    SONAR_HOST_URL: https://next.sonarqube.com/sonarqube
+    matrix:
+      - name: "sonarcloud.io"
+        SHADOW_SONAR_TOKEN: VAULT[development/kv/data/sonarcloud data.token]
+        SHADOW_SONAR_HOST_URL: "https://sonarcloud.io"
+      - name: "sonarqube.us"
+        SHADOW_SONAR_TOKEN: VAULT[development/kv/data/sonarqube-us data.token]
+        SHADOW_SONAR_HOST_URL: "https://sonarqube.us"
+  build_and_shadow_scan_script:
+    - *log_develocity_url_script
+    - source cirrus-env BUILD
+    - source set_gradle_build_version
+    - ./shadow-scan-and-issue-replication.sh
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 ### QA tasks
 
@@ -166,6 +193,7 @@ ws_scan_task:
 promote_task:
   depends_on:
     - build
+    - sonar_shadow_scan_and_issue_replication
     - qa_plugin
     - qa_ruling
   <<: *ONLY_IF_SONARSOURCE_QA
