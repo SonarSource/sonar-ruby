@@ -36,6 +36,41 @@ jobs:
           artifactory-reader-role: private-reader    # Override for public repo using private access
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
 
+  qa_plugin:
+    needs: [build]
+    runs-on: github-ubuntu-latest-s  # Public repository runner
+    name: QA Plugin Tests
+    permissions:
+      id-token: write  # Required for Vault OIDC authentication
+      contents: write  # Required for repository access
+    strategy:
+      matrix:
+        sq_version: [DEV, LATEST_RELEASE]
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Get Vault secrets
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/licenses-ro token | GITHUB_TOKEN;
+            development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader access_token | ARTIFACTORY_ACCESS_TOKEN;
+      - name: Run QA Plugin Tests
+        env:
+          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+          ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_ACCESS_TOKEN }}
+          SQ_VERSION: ${{ matrix.sq_version }}
+          BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
+        run: |
+          ./gradlew ":its:plugin:test" "-Pplugin" \
+            "-Dsonar.runtimeVersion=${SQ_VERSION}" \
+            "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" \
+            "-DbuildNumber=${BUILD_NUMBER}" \
+            -Pqa --info --stacktrace --console plain --no-daemon --build-cache
+
   qa_ruling:
     needs: [build]
     runs-on: github-ubuntu-latest-s  # Public repository runner
@@ -75,6 +110,7 @@ jobs:
   promote:
     needs:
       - build
+      - qa_plugin
       - qa_ruling
     runs-on: github-ubuntu-latest-s  # Public repository runner
     name: Promote
