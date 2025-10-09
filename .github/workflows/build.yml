@@ -62,8 +62,9 @@ jobs:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
           ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ARTIFACTORY_ACCESS_TOKEN }}
           BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
-          # Ruling only tests that the results of analysis are did not change,
+          # Ruling tests only that the results of analysis have not changed,
           # so one sonar.runtimeVersion is enough.
+          # Plugin tests check API compatibility, so they should run against all supported versions.
         run: |
           ./gradlew ":its:ruling:test" "-Pruling" \
             "-Dsonar.runtimeVersion=LATEST_RELEASE" \
