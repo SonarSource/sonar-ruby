@@ -3,7 +3,6 @@ on:
   schedule:
     - cron: '0 4 * * *' # Run the workflow every day at 04:00 UTC
   workflow_dispatch:
-  pull_request: # For testing new workflow
 
 jobs:
   unified-platform-dogfooding:
