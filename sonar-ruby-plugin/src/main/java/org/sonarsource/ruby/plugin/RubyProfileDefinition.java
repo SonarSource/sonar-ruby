@@ -16,17 +16,33 @@
  */
 package org.sonarsource.ruby.plugin;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.sonar.api.rule.RuleKey;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
+import org.sonar.plugins.ruby.api.RubyProfileRegistrar;
 import org.sonarsource.analyzer.commons.BuiltInQualityProfileJsonLoader;
 
 public class RubyProfileDefinition implements BuiltInQualityProfilesDefinition {
 
   static final String PATH_TO_JSON = "org/sonar/l10n/ruby/rules/ruby/Sonar_way_profile.json";
+  private final List<RuleKey> additionalRules = new ArrayList<>();
+
+  public RubyProfileDefinition() {
+    this(new RubyProfileRegistrar[]{});
+  }
+
+  public RubyProfileDefinition(RubyProfileRegistrar[] registrars) {
+    for (var registrar : registrars) {
+      registrar.register(additionalRules::addAll);
+    }
+  }
 
   @Override
   public void define(Context context) {
     NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(RubyPlugin.PROFILE_NAME, RubyPlugin.RUBY_LANGUAGE_KEY);
     BuiltInQualityProfileJsonLoader.load(profile, RubyPlugin.RUBY_REPOSITORY_KEY, PATH_TO_JSON);
+    additionalRules.forEach(ruleKey -> profile.activateRule(ruleKey.repository(), ruleKey.rule()));
     profile.done();
   }
 

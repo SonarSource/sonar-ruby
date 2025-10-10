@@ -199,6 +199,7 @@ sonar {
         property 'sonar.links.scm', "${sonarLinksScm}"
         property 'sonar.links.issue', 'https://jira.sonarsource.com/browse/SONARRUBY'
         property 'sonar.exclusions', '**/build/**/*'
+        property 'sonar.coverage.exclusions', 'its/test-plugin/**/*'
     }
 }
 
