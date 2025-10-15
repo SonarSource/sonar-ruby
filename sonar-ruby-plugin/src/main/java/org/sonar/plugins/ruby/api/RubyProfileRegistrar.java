@@ -39,7 +39,7 @@ import org.sonarsource.api.sonarlint.SonarLintSide;
 @ServerSide
 public interface RubyProfileRegistrar {
   /**
-   * This method is called on server side and during an analysis to modify the builtin default quality profile for java.
+   * This method is called on server side and during an analysis to modify the builtin default quality profile for Ruby.
    */
   void register(RegistrarContext registrarContext);
 
