@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.sonar.api.Beta;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.server.ServerSide;
-import org.sonarsource.api.sonarlint.SonarLintSide;
 
 /**
  * This class can be extended to provide additional rule keys in the builtin default quality profile.
