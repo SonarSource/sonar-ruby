@@ -35,7 +35,6 @@ import org.sonarsource.api.sonarlint.SonarLintSide;
  *
  */
 @Beta
-@SonarLintSide
 @ServerSide
 public interface RubyProfileRegistrar {
   /**
