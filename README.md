@@ -1,6 +1,6 @@
 # sonar-ruby
 
-[![Build Status](https://api.cirrus-ci.com/github/SonarSource/sonar-ruby.svg?branch=master)](https://cirrus-ci.com/github/SonarSource/sonar-ruby)
+[![Build Status](https://github.com/SonarSource/sonar-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SonarSource/sonar-ruby/actions/workflows/build.yml)
 [![Quality Gate Status](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-ruby&metric=alert_status&token=sqb_a78a1551add08b844fb442b01edcb5cc144ed1cb)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-ruby)
 [![Coverage](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-ruby&metric=coverage&token=sqb_a78a1551add08b844fb442b01edcb5cc144ed1cb)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-ruby)
 
