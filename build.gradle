@@ -46,7 +46,7 @@ allprojects {
         def artifactoryBearerToken = System.getenv("ARTIFACTORY_PRIVATE_PASSWORD") ?: project.findProperty("artifactoryPassword")
         if (artifactoryBearerToken) {
             maven {
-                url "https://repox.jfrog.io/repox/sonarsource"
+                url = "https://repox.jfrog.io/repox/sonarsource"
                 authentication {
                     header(HttpHeaderAuthentication)
                 }
@@ -102,7 +102,7 @@ subprojects {
 
     test {
         testLogging {
-            exceptionFormat 'full' // log the full stack trace (default is the 1st line of the stack trace)
+            exceptionFormat = 'full' // log the full stack trace (default is the 1st line of the stack trace)
             events "skipped", "failed"
             // verbose log for failed and skipped tests (by default the name of the tests are not logged)
         }
@@ -172,7 +172,7 @@ subprojects {
         def signingKey = findProperty("signingKey")
         def signingPassword = findProperty("signingPassword")
         useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-        required {
+        required = {
             def branch = System.getenv()["GITHUB_REF_NAME"]
             return (branch == 'master' || branch ==~ 'branch-[\\d.]+') &&
               gradle.taskGraph.hasTask(":artifactoryPublish")
