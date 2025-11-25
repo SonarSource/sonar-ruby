@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: github-ubuntu-latest-s  # Public repository runner
+    runs-on: github-ubuntu-latest-m  # Public repository runner
     name: Build
     permissions:
       id-token: write  # Required for Vault OIDC authentication
@@ -40,7 +40,7 @@ jobs:
   qa:
     needs: [build]
     if: ${{ needs.build.outputs.deployed }}
-    runs-on: github-ubuntu-latest-s  # Public repository runner
+    runs-on: github-ubuntu-latest-m  # Public repository runner
     name: QA Tests
     permissions:
       id-token: write  # Required for Vault OIDC authentication
