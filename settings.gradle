@@ -26,12 +26,12 @@ buildCache {
 }
 
 dependencyResolutionManagement {
-    def slangDependenciesVersion = '1.19.0.6612'
+    def slangDependenciesVersion = '1.20.0.7866'
     def analyzerCommonsVersion = '2.20.0.4607'
     def pluginApiVersion = '12.0.0.2960'
     def sonarqubeVersion = '10.0.0.68432'
-    def orchestratorVersion = '5.6.2.2625'
-    def sonarlintVersion = '9.0.0.74282'
+    def orchestratorVersion = '6.0.1.3892'
+    def sonarlintVersion = '9.8.0.76914'
     // slf4j is provided by SQ, SC or SL, should be aligned with sonar-plugin-api
     def slf4jApiVersion = '1.7.30'
 
@@ -58,6 +58,7 @@ dependencyResolutionManagement {
             library("assertj-core", "org.assertj", "assertj-core").version("3.26.3")
             library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("5.11.0")
             library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("5.11.0")
+            library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("6.0.1")
         }
     }
 }

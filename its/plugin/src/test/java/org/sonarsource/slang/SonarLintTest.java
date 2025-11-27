@@ -74,7 +74,7 @@ public class SonarLintTest {
       .setSonarVersion(System.getProperty(Tests.SQ_VERSION_PROPERTY, Tests.DEFAULT_SQ_VERSION))
       .build();
 
-    Locators locators = orchestrator.getConfiguration().locators();
+    Locators locators = orchestrator.getOrchestrator().getLocators();
     StandaloneGlobalConfiguration.Builder sonarLintConfigBuilder = StandaloneGlobalConfiguration.builder();
     orchestrator.getDistribution().getPluginLocations().stream()
       .filter(location -> !location.toString().contains("sonar-reset-data-plugin"))

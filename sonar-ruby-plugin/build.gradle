@@ -66,6 +66,7 @@ dependencies {
     testImplementation testLibs.sonar.plugin.api.test.fixtures
 
     testRuntimeOnly testLibs.junit.jupiter.engine
+    testRuntimeOnly testLibs.junit.platform.launcher
 }
 
 tasks.register("downloadFromRubygems", Task) {
@@ -167,7 +168,7 @@ jar {
                 'Sonar-Version': '6.7',
                 'SonarLint-Supported': 'true',
                 'Version': "${project.version}",
-                'Jre-Min-Version': '11',
+                'Jre-Min-Version': '17',
         )
     }
 }
