@@ -66,6 +66,7 @@ dependencies {
     testImplementation testLibs.sonar.plugin.api.test.fixtures
 
     testRuntimeOnly testLibs.junit.jupiter.engine
+    testRuntimeOnly testLibs.junit.platform.launcher
 }
 
 task downloadFromRubygems(type: Task) {
