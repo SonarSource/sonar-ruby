@@ -168,7 +168,7 @@ jar {
                 'Sonar-Version': '6.7',
                 'SonarLint-Supported': 'true',
                 'Version': "${project.version}",
-                'Jre-Min-Version': '11',
+                'Jre-Min-Version': '17',
         )
     }
 }
