@@ -36,7 +36,7 @@ ext {
 }
 
 processResources.duplicatesStrategy = DuplicatesStrategy.INCLUDE
-processResources.from("src/main/resources", "${buildDir}/dependency_gems/gems")
+processResources.from("src/main/resources", "${getLayout().getBuildDirectory()}/dependency_gems/gems")
 
 dependencies {
     compileOnly libs.sonar.plugin.api
@@ -53,9 +53,9 @@ dependencies {
     //   http://rubygems-proxy.torquebox.org/releases/rubygems/racc/1.5.2/racc-1.5.2-java.pom
     // But "rubygems-proxy.torquebox.org" server does not exist anymore.
     // The bellow function "downloadFromRubygems" is a workaround to this problem
-    gems files("${buildDir}/rubygems_downloads/racc-${rubygemsRaccVersion}.gem")
-    gems files("${buildDir}/rubygems_downloads/ast-${rubygemsAstVersion}.gem")
-    gems files("${buildDir}/rubygems_downloads/parser-${rubygemsParserVersion}.gem")
+    gems files("${getLayout().getBuildDirectory()}/rubygems_downloads/racc-${rubygemsRaccVersion}.gem")
+    gems files("${getLayout().getBuildDirectory()}/rubygems_downloads/ast-${rubygemsAstVersion}.gem")
+    gems files("${getLayout().getBuildDirectory()}/rubygems_downloads/parser-${rubygemsParserVersion}.gem")
 
     testImplementation testLibs.slang.antlr
     testImplementation testLibs.assertj.core
@@ -68,7 +68,7 @@ dependencies {
     testRuntimeOnly testLibs.junit.jupiter.engine
 }
 
-task downloadFromRubygems(type: Task) {
+tasks.register("downloadFromRubygems", Task) {
     doLast {
         configurations.gems
           .findAll { !it.exists() }
@@ -84,14 +84,14 @@ task downloadFromRubygems(type: Task) {
     }
 }
 
-task unpackDependencyGems(type: JRubyPrepare) {
-    outputDir "${buildDir}/dependency_gems"
+tasks.register("unpackDependencyGems", JRubyPrepare) {
+    outputDir "${getLayout().getBuildDirectory()}/dependency_gems"
     dependencies configurations.gems
 }
-task copyGemsJarsFromDirectoryToShadowBugWorkaroundJar(type: Jar) {
-    from "${buildDir}/dependency_gems/gems"
+tasks.register("copyGemsJarsFromDirectoryToShadowBugWorkaroundJar", Jar) {
+    from "${getLayout().getBuildDirectory()}/dependency_gems/gems"
     includes = ['**/*.jar']
-    destinationDirectory = file("${buildDir}/tmp")
+    destinationDirectory = file("${getLayout().getBuildDirectory()}/tmp")
     archiveFileName = "shadowBugWorkaround.jar"
 }
 
@@ -175,7 +175,7 @@ shadowJar {
     // shadowJar can not embed jar files, it always extract them.
     // https://imperceptiblethoughts.com/shadow/configuration/dependencies/#embedding-jar-files-inside-your-shadow-jar
     // the workaround used here, is to put jar in jar
-    from file("${buildDir}/tmp/shadowBugWorkaround.jar")
+    from file("${getLayout().getBuildDirectory()}/tmp/shadowBugWorkaround.jar")
     exclude 'com/headius/racc/**' // from shadowBugWorkaround.jar
 
     exclude 'javax/**' // com.google.code.findbugs:jsr305
