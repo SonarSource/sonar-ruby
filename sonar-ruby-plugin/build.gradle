@@ -32,7 +32,7 @@ import com.github.jrubygradle.JRubyPrepare
 ext {
     rubygemsRaccVersion = '1.8.1-java'
     rubygemsAstVersion = '2.4.3'
-    rubygemsParserVersion = '3.3.4.2'
+    rubygemsParserVersion = '3.3.10.0'
 }
 
 processResources.duplicatesStrategy = DuplicatesStrategy.INCLUDE
