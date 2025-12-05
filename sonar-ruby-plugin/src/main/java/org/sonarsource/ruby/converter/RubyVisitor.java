@@ -368,7 +368,7 @@ public class RubyVisitor {
     if (catchParameterChildren.size() == 1) {
       catchParameter = catchParameterChildren.get(0);
     } else if (!catchParameterChildren.isEmpty()) {
-      List<TextRange> textRanges = catchParameterChildren.stream().map(Tree::textRange).collect(Collectors.toList());
+      List<TextRange> textRanges = catchParameterChildren.stream().map(Tree::textRange).toList();
       TextRange catchParameterRange = TextRanges.merge(textRanges);
       catchParameter = new NativeTreeImpl(metaDataProvider.metaData(catchParameterRange), new RubyNativeKind(node.type()), catchParameterChildren);
     }
@@ -460,7 +460,7 @@ public class RubyVisitor {
         .stream()
         .filter(IdentifierTree.class::isInstance)
         .map(IdentifierTree.class::cast)
-        .collect(Collectors.toList());
+        .toList();
 
     List<Tree> rhsChild = getChildIfArray((Tree) children.get(1));
 
@@ -887,7 +887,7 @@ public class RubyVisitor {
       expression = (Tree) children.get(0);
     } else if (!children.isEmpty()) {
       List<Tree> childTrees = convertChildren(node, children);
-      TextRange childRange = TextRanges.merge(childTrees.stream().map(Tree::textRange).collect(Collectors.toList()));
+      TextRange childRange = TextRanges.merge(childTrees.stream().map(Tree::textRange).toList());
       expression = new NativeTreeImpl(metaDataProvider.metaData(childRange), new RubyNativeKind("returnExpression"), childTrees);
     }
     return new ReturnTreeImpl(metaData(node), keyword, expression);
