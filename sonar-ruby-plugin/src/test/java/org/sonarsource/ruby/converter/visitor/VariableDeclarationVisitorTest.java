@@ -42,18 +42,19 @@ class VariableDeclarationVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void class_scope() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Test\n" +
-      "    fooVar = 10\n" +  // variable declaration
-      "    barVar = 10\n" +  // variable declaration
-      "\n" +
-      "    define_method :foo do \n" +
-      "      fooVar = 2\n" +  // assignment
-      "      puts fooVar\n" +
-      "    end\n" +
-      "\n" +
-      "def bar; fooVar = 1; end\n" + // variable declaration shadowing one from class
-      "barVar = 10\n" +  // re-assignment
-      "end");
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Test
+          fooVar = 10
+          barVar = 10
+
+          define_method :foo do\s
+            fooVar = 2
+            puts fooVar
+          end
+
+      def bar; fooVar = 1; end
+      barVar = 10
+      end""");
     Tree body = tree.classTree().children().get(1);
     assertTree(body.children().get(0)).isInstanceOf(VariableDeclarationTree.class);  // fooVar
     assertTree(body.children().get(1)).isInstanceOf(VariableDeclarationTree.class);  // barVar

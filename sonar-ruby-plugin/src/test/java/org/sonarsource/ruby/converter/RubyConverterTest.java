@@ -135,13 +135,14 @@ class RubyConverterTest extends AbstractRubyConverterTest {
     assertTree(nativeAllInstructionsTree.children().get(0)).hasTextRange(1, 0, 1, 1);
     assertTree(nativeAllInstructionsTree.children().get(1)).hasTextRange(1, 3, 1, 6);
 
-    topLevelTree = converter.parse("#start comment\n" +
-      "require 'stuff'\n" +
-      "a = 2 && 1\n" +
-      "def method()\n" +
-      "  a += 2 # line comment\n" +
-      "end\n" +
-      "result = obj.methodcall(argument) ; result");
+    topLevelTree = converter.parse("""
+      #start comment
+      require 'stuff'
+      a = 2 && 1
+      def method()
+        a += 2 # line comment
+      end
+      result = obj.methodcall(argument) ; result""");
     nativeAllInstructionsTree = topLevelTree.children().get(0);
     assertTree(topLevelTree).hasTextRange(1, 0, 7, 42);
     assertTree(nativeAllInstructionsTree.children().get(0)).hasTextRange(2, 0, 2, 15);
@@ -152,18 +153,19 @@ class RubyConverterTest extends AbstractRubyConverterTest {
 
   @Test
   void comments() {
-    TopLevelTree tree = (TopLevelTree) converter.parse("#start comment\n" +
-      "require 'stuff'\n" +
-      "a = 2 && 1\n" +
-      "def method()\n" +
-      "  a += 2 # line comment\n" +
-      "end\n" +
-      "result = obj.methodcall(argument) ; result\n" +
-      "=begin\n" +
-      "First line\n" +
-      "End multiline comment\n" +
-      "=end\n" +
-      "#");
+    TopLevelTree tree = (TopLevelTree) converter.parse("""
+      #start comment
+      require 'stuff'
+      a = 2 && 1
+      def method()
+        a += 2 # line comment
+      end
+      result = obj.methodcall(argument) ; result
+      =begin
+      First line
+      End multiline comment
+      =end
+      #""");
 
     assertThat(tree.allComments()).extracting(Comment::text).containsExactly(
       "#start comment",
@@ -200,20 +202,26 @@ class RubyConverterTest extends AbstractRubyConverterTest {
       TextRanges.range(1, 6, 3, 0));
 
     assertComment("=begin \r\n comment \r\ncontent\r\n=end\r\n",
-      "=begin \n" +
-        " comment \n" +
-        "content\n" +
-        "=end\n",
-      " \n comment \n" +
-        "content\n",
+      """
+      =begin\s
+       comment\s
+      content
+      =end
+      """,
+      """
+      \s
+       comment\s
+      content
+      """,
       TextRanges.range(1, 0, 5, 0),
       TextRanges.range(1, 6, 4, 0));
   }
 
   @Test
   void ast() {
-    List<Tree> tree = rubyStatements("require 'stuff'\n" +
-      "a = 2 && 1.0");
+    List<Tree> tree = rubyStatements("""
+      require 'stuff'
+      a = 2 && 1.0""");
     Tree stringLiteral = stringLiteral("'stuff'", "stuff");
     Tree require = identifier("require");
     Tree requireCall = nativeTree(nativeKind("send"), asList(require, stringLiteral));
@@ -227,10 +235,11 @@ class RubyConverterTest extends AbstractRubyConverterTest {
 
   @Test
   void tokens() {
-    Tree tree = converter.parse("# line comment\n" +
-      "if a == 1\n" +
-      "  a = \"ABC\"\n" +
-      "end");
+    Tree tree = converter.parse("""
+      # line comment
+      if a == 1
+        a = "ABC"
+      end""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -242,11 +251,12 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   // Since 2.6 version
   @Test
   void yieldSelf() {
-    Tree tree = converter.parse("class MyClass\n" +
-      "  def some_method\n" +
-      "    @path.yield_self(&File.method(:read)).yield_self(&Parser.method(:new)) ...\n" +
-      "  end\n" +
-      "end");
+    Tree tree = converter.parse("""
+      class MyClass
+        def some_method
+          @path.yield_self(&File.method(:read)).yield_self(&Parser.method(:new)) ...
+        end
+      end""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -267,10 +277,11 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   // Since 2.6 version
   @Test
   void composition() {
-    Tree tree = converter.parse("f = proc{|x| x + 2}\n" +
-      "g = proc{|x| x * 3}\n" +
-      "(f << g).call(3)\n" +
-      "(f >> g).call(3)");
+    Tree tree = converter.parse("""
+      f = proc{|x| x + 2}
+      g = proc{|x| x * 3}
+      (f << g).call(3)
+      (f >> g).call(3)""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -280,8 +291,10 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   // Since 2.7 version
   @Test
   void beginless() {
-    Tree tree = converter.parse("ary[..3]\n" +
-      "rel.where(sales: ..100)\n");
+    Tree tree = converter.parse("""
+      ary[..3]
+      rel.where(sales: ..100)
+      """);
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -322,22 +335,23 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   
   @Test
   void ractor() {
-    Tree tree = converter.parse("def tarai(x, y, z) =\n" +
-      "  x <= y ? y : tarai(tarai(x-1, y, z),\n" +
-      "                     tarai(y-1, z, x),\n" +
-      "                     tarai(z-1, x, y))\n" +
-      "require 'benchmark'\n" +
-      "Benchmark.bm do |x|\n" +
-      "  # sequential version\n" +
-      "  x.report('seq'){ 4.times{ tarai(14, 7, 0) } }\n" +
-      "\n" +
-      "  # parallel version\n" +
-      "  x.report('par'){\n" +
-      "    4.times.map do\n" +
-      "      Ractor.new { tarai(14, 7, 0) }\n" +
-      "    end.each(&:take)\n" +
-      "  }\n" +
-      "end");
+    Tree tree = converter.parse("""
+      def tarai(x, y, z) =
+        x <= y ? y : tarai(tarai(x-1, y, z),
+                           tarai(y-1, z, x),
+                           tarai(z-1, x, y))
+      require 'benchmark'
+      Benchmark.bm do |x|
+        # sequential version
+        x.report('seq'){ 4.times{ tarai(14, 7, 0) } }
+
+        # parallel version
+        x.report('par'){
+          4.times.map do
+            Ractor.new { tarai(14, 7, 0) }
+          end.each(&:take)
+        }
+      end""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -346,17 +360,18 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   
   @Test
   void fiberScheduler() {
-    Tree tree = converter.parse("require 'async'\n" +
-      "require 'net/http'\n" +
-      "require 'uri'\n" +
-      "\n" +
-      "Async do\n" +
-      "  [\"ruby\", \"rails\", \"async\"].each do |topic|\n" +
-      "    Async do\n" +
-      "      Net::HTTP.get(URI \"https://www.google.com/search?q=#{topic}\")\n" +
-      "    end\n" +
-      "  end\n" +
-      "end");
+    Tree tree = converter.parse("""
+      require 'async'
+      require 'net/http'
+      require 'uri'
+
+      Async do
+        ["ruby", "rails", "async"].each do |topic|
+          Async do
+            Net::HTTP.get(URI "https://www.google.com/search?q=#{topic}")
+          end
+        end
+      end""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -365,11 +380,12 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   
   @Test
   void onelinePatternMatching() {
-    Tree tree = converter.parse("0 => a\n" +
-      "p a #=> 0\n" +
-      "\n" +
-      "{b: 0, c: 1} => {b:}\n" +
-      "p b #=> 0");
+    Tree tree = converter.parse("""
+      0 => a
+      p a #=> 0
+
+      {b: 0, c: 1} => {b:}
+      p b #=> 0""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -378,13 +394,14 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   
   @Test
   void findPattern() {
-    Tree tree = converter.parse("case [\"a\", 1, \"b\", \"c\", 2, \"d\", \"e\", \"f\", 3]\n" +
-      "in [*pre, String => x, String => y, *post]\n" +
-      "  p pre  #=> [\"a\", 1]\n" +
-      "  p x    #=> \"b\"\n" +
-      "  p y    #=> \"c\"\n" +
-      "  p post #=> [2, \"d\", \"e\", \"f\", 3]\n" +
-      "end");
+    Tree tree = converter.parse("""
+      case ["a", 1, "b", "c", 2, "d", "e", "f", 3]
+      in [*pre, String => x, String => y, *post]
+        p pre  #=> ["a", 1]
+        p x    #=> "b"
+        p y    #=> "c"
+        p post #=> [2, "d", "e", "f", 3]
+      end""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -393,8 +410,9 @@ class RubyConverterTest extends AbstractRubyConverterTest {
 
   @Test
   void hashExcept() {
-    Tree tree = converter.parse("h = { a: 1, b: 2, c: 3 }\n" +
-      "p h.except(:a) #=> {:b=>2, :c=>3}");
+    Tree tree = converter.parse("""
+      h = { a: 1, b: 2, c: 3 }
+      p h.except(:a) #=> {:b=>2, :c=>3}""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -405,9 +423,10 @@ class RubyConverterTest extends AbstractRubyConverterTest {
 
   @Test
   void newHashSyntax() {
-    Tree tree = converter.parse("a = 1\n" +
-      "b = 2\n" +
-      "h = {a:, b:}");
+    Tree tree = converter.parse("""
+      a = 1
+      b = 2
+      h = {a:, b:}""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -416,10 +435,10 @@ class RubyConverterTest extends AbstractRubyConverterTest {
 
   @Test
   void anonymousBlockArgument() {
-    Tree tree = converter.parse("def logged_open(filename, &)\n" +
-      "puts \"Opening #{filename}...\"\n" +
-      "File.open(filename, &)" +
-      "end");
+    Tree tree = converter.parse("""
+      def logged_open(filename, &)
+      puts "Opening #{filename}..."
+      File.open(filename, &)end""");
 
     List<Token> tokens = tree.metaData().tokens();
 
@@ -437,12 +456,13 @@ class RubyConverterTest extends AbstractRubyConverterTest {
 
   @Test
   void newAnonymousRestAndKeywordSyntax(){
-    Tree tree = converter.parse("def foo(*)\n" +
-      " bar(*)\n" +
-      "end\n" +
-      "def baz(**)\n" +
-      " quux(**)\n" +
-      "end");
+    Tree tree = converter.parse("""
+      def foo(*)
+       bar(*)
+      end
+      def baz(**)
+       quux(**)
+      end""");
 
     List<Token> tokens = tree.metaData().tokens();
 

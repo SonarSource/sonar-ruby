@@ -32,12 +32,13 @@ class CaseVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void case_when() {
-    MatchTree tree = (MatchTree) rubyStatement("case x\n " +
-      "when 42\n " +
-      "when 0..4 then doSomething()\n " +
-      "when 53 then doSomething(); doSomethingElse()\n " +
-      "else doSomething()" +
-      "\nend");
+    MatchTree tree = (MatchTree) rubyStatement("""
+      case x
+       when 42
+       when 0..4 then doSomething()
+       when 53 then doSomething(); doSomethingElse()
+       else doSomething()
+      end""");
 
     assertThat(tree.keyword().text()).isEqualTo("case");
     assertTree(tree.expression()).isEquivalentTo(sendToIdentifier("x"));
@@ -63,11 +64,12 @@ class CaseVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void case_when_with_empty_else() {
-    MatchTree tree = (MatchTree) rubyStatement("case x\n " +
-      "when a\n" +
-      "else\n" +
-      "  # comment" +
-      "\nend");
+    MatchTree tree = (MatchTree) rubyStatement("""
+      case x
+       when a
+      else
+        # comment
+      end""");
 
     assertThat(tree.cases()).hasSize(2);
     assertThat(tree.cases().get(0).expression()).isNotNull();
@@ -93,13 +95,13 @@ class CaseVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void case_when_multiple() {
-    MatchTree tree = (MatchTree) rubyStatement(
-            "case x\n " +
-            "when 1, 7\n " +
-            "  doSomething()\n" +
-            "  doManyThings()\n" +
-            "else doSomethingElse()\n" +
-            "end");
+    MatchTree tree = (MatchTree) rubyStatement("""
+      case x
+       when 1, 7
+         doSomething()
+        doManyThings()
+      else doSomethingElse()
+      end""");
 
     assertThat(tree.keyword().text()).isEqualTo("case");
     assertTree(tree.expression()).isEquivalentTo(sendToIdentifier("x"));
@@ -118,11 +120,11 @@ class CaseVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void case_when_multiple_and_empty_body() {
-    MatchTree tree = (MatchTree) rubyStatement(
-            "case x\n " +
-            "when 1, 7\n " +
-            "else doSomethingElse()\n" +
-            "end");
+    MatchTree tree = (MatchTree) rubyStatement("""
+      case x
+       when 1, 7
+       else doSomethingElse()
+      end""");
 
     assertThat(tree.keyword().text()).isEqualTo("case");
     assertTree(tree.expression()).isEquivalentTo(sendToIdentifier("x"));

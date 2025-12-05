@@ -30,10 +30,10 @@ class RaiseVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void test_raise() {
-    FunctionDeclarationTree tree = ((FunctionDeclarationTree) rubyStatement("" +
-      "def foo\n" +
-      "  raise 42\n" +
-      "end"));
+    FunctionDeclarationTree tree = ((FunctionDeclarationTree) rubyStatement("""
+      def foo
+        raise 42
+      end"""));
     Tree raise = tree.body().statementOrExpressions().get(0);
     assertTree(raise).isInstanceOf(ThrowTree.class);
     ThrowTree throwTree = (ThrowTree) raise;
@@ -43,10 +43,10 @@ class RaiseVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void test_raise_multi_value() {
-    FunctionDeclarationTree tree = ((FunctionDeclarationTree) rubyStatement("" +
-      "def foo\n" +
-      "  raise 42, 43\n" +
-      "end"));
+    FunctionDeclarationTree tree = ((FunctionDeclarationTree) rubyStatement("""
+      def foo
+        raise 42, 43
+      end"""));
     Tree raise = tree.body().statementOrExpressions().get(0);
     assertTree(raise).isInstanceOf(ThrowTree.class);
     ThrowTree throwTree = (ThrowTree) raise;

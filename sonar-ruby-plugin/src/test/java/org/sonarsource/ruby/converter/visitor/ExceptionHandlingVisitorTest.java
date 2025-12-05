@@ -35,19 +35,19 @@ class ExceptionHandlingVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void begin_rescue_else_ensure() {
-    ExceptionHandlingTree exceptionHandlingTree = (ExceptionHandlingTree) rubyStatement("" +
-      "begin\n" +
-      "  1\n" +
-      "  5\n" +
-      "rescue A, B, C => a\n" +
-      "  2\n" +
-      "rescue\n" +
-      "  # comment\n" +
-      "else\n" +
-      "  3\n" +
-      "ensure\n" +
-      "  4\n" +
-      "end");
+    ExceptionHandlingTree exceptionHandlingTree = (ExceptionHandlingTree) rubyStatement("""
+      begin
+        1
+        5
+      rescue A, B, C => a
+        2
+      rescue
+        # comment
+      else
+        3
+      ensure
+        4
+      end""");
 
     assertRange(exceptionHandlingTree.textRange()).hasRange(1, 0, 12, 3);
     assertTree(exceptionHandlingTree.tryBlock()).isBlock(LiteralTree.class, LiteralTree.class);
@@ -79,35 +79,35 @@ class ExceptionHandlingVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void implicit_rescue_not_mapped() {
-    Tree tree = rubyStatement("" +
-      "def foo\n" +
-      "  1\n" +
-      "  rescue A\n" +
-      "  else\n" +
-      "end");
+    Tree tree = rubyStatement("""
+      def foo
+        1
+        rescue A
+        else
+      end""");
     assertThat(tree.descendants().anyMatch(ExceptionHandlingTree.class::isInstance)).isFalse();
     assertThat(tree.descendants().anyMatch(CatchTree.class::isInstance)).isFalse();
 
-    tree = rubyStatement("" +
-      "class A\n" +
-      "  rescue\n" +
-      "end");
+    tree = rubyStatement("""
+      class A
+        rescue
+      end""");
     assertThat(tree.descendants().anyMatch(ExceptionHandlingTree.class::isInstance)).isFalse();
     assertThat(tree.descendants().anyMatch(CatchTree.class::isInstance)).isFalse();
 
-    tree = rubyStatement("" +
-      "class A\n" +
-      "  ensure\n" +
-      "end");
+    tree = rubyStatement("""
+      class A
+        ensure
+      end""");
     assertThat(tree.descendants().anyMatch(ExceptionHandlingTree.class::isInstance)).isFalse();
     assertThat(tree.descendants().anyMatch(CatchTree.class::isInstance)).isFalse();
 
-    tree = rubyStatement("" +
-      "begin\n" +
-      "  def a()\n" +
-      "   rescue A\n" +
-      "  end\n" +
-      "end");
+    tree = rubyStatement("""
+      begin
+        def a()
+         rescue A
+        end
+      end""");
     assertThat(tree.descendants().anyMatch(ExceptionHandlingTree.class::isInstance)).isFalse();
     assertThat(tree.descendants().anyMatch(CatchTree.class::isInstance)).isFalse();
   }
@@ -121,16 +121,16 @@ class ExceptionHandlingVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void empty_blocks_with_comments() {
-    ExceptionHandlingTree exceptionHandlingTree = (ExceptionHandlingTree) rubyStatement("" +
-      "begin\n" +
-      "  # comment 0\n" +
-      "  rescue\n" +
-      "    # comment 1\n" +
-      "  else\n" +
-      "    # comment 2\n" +
-      "  ensure\n" +
-      "    # comment 3\n" +
-      "end");
+    ExceptionHandlingTree exceptionHandlingTree = (ExceptionHandlingTree) rubyStatement("""
+      begin
+        # comment 0
+        rescue
+          # comment 1
+        else
+          # comment 2
+        ensure
+          # comment 3
+      end""");
 
     assertRange(exceptionHandlingTree.textRange()).hasRange(1, 0, 9, 3);
     assertThat(exceptionHandlingTree.catchBlocks()).hasSize(2);
@@ -163,11 +163,11 @@ class ExceptionHandlingVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void only_ensure_block() {
-    ExceptionHandlingTree exceptionHandlingTree = (ExceptionHandlingTree) rubyStatement("" +
-      "begin\n" +
-      "  ensure\n" +
-      "    1\n" +
-      "end");
+    ExceptionHandlingTree exceptionHandlingTree = (ExceptionHandlingTree) rubyStatement("""
+      begin
+        ensure
+          1
+      end""");
 
     assertRange(exceptionHandlingTree.textRange()).hasRange(1, 0, 4, 3);
     assertThat(exceptionHandlingTree.catchBlocks()).isEmpty();

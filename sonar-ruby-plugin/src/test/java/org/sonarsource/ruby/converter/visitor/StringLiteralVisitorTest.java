@@ -60,11 +60,13 @@ class StringLiteralVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void heredoc_literal() {
-    NativeTree tree = (NativeTree) rubyStatement("<<-CODE\n" +
-      "      get '/#{asset}' do\n" +
-      "        redirect asset_path('#{asset}', protocol: 'http')\n" +
-      "      end\n" +
-      "    CODE\n");
+    NativeTree tree = (NativeTree) rubyStatement("""
+      <<-CODE
+            get '/#{asset}' do
+              redirect asset_path('#{asset}', protocol: 'http')
+            end
+          CODE
+      """);
     assertTree(tree).hasChildren(7);
     assertTree(tree).hasChildren(
       NativeTree.class,
