@@ -59,7 +59,7 @@ class ExceptionHandlingVisitorTest extends AbstractRubyConverterTest {
     List<IdentifierTree> exceptionIdentifierTrees = rescueClause1.catchParameter().descendants()
       .filter(IdentifierTree.class::isInstance)
       .map(IdentifierTree.class::cast)
-      .collect(Collectors.toList());
+      .toList();
     assertThat(exceptionIdentifierTrees).extracting(IdentifierTree::name).containsExactly("A", "B", "C", "a");
 
     CatchTree rescueClause2 = exceptionHandlingTree.catchBlocks().get(1);

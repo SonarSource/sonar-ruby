@@ -362,7 +362,7 @@ public class RubyVisitor {
       .limit(2)
       .filter(Objects::nonNull)
       .map(Tree.class::cast)
-      .collect(Collectors.toList());
+      .toList();
 
     Tree catchParameter = null;
     if (catchParameterChildren.size() == 1) {
@@ -506,7 +506,7 @@ public class RubyVisitor {
       List<Tree> lhsChildren = children.subList(0, children.size() - 1).stream()
         .filter(Tree.class::isInstance)
         .map(Tree.class::cast)
-        .collect(Collectors.toList());
+        .toList();
 
       // such ruby native kind is required to have tree equivalence
       Tree lhs = new NativeTreeImpl(lhsMeta, new RubyNativeKind("index"), lhsChildren);
@@ -900,7 +900,7 @@ public class RubyVisitor {
   }
 
   private List<Tree> convertChildren(AstNode node, List<?> children) {
-    return children.stream().flatMap(child -> treeForChild(node, child)).collect(Collectors.toList());
+    return children.stream().flatMap(child -> treeForChild(node, child)).toList();
   }
 
   @CheckForNull
