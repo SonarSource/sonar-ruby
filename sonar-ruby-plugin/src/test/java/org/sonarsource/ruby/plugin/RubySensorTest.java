@@ -33,8 +33,11 @@ class RubySensorTest extends AbstractSensorTest {
 
   @Test
   void simple_file() {
-    InputFile inputFile = createInputFile("file1.rb", "" +
-      "class C\nend\nputs '1 == 1'; puts 'abc'\n");
+    InputFile inputFile = createInputFile("file1.rb", """
+      class C
+      end
+      puts '1 == 1'; puts 'abc'
+      """);
     context.fileSystem().add(inputFile);
     sensor(checkFactory()).execute(context);
 
@@ -47,32 +50,33 @@ class RubySensorTest extends AbstractSensorTest {
 
   @Test
   void test_access_modifiers_are_highlighted() {
-    String source ="" +
-      "class Foo\n" +
-      "  def is_public_by_default()\n" +
-      "    public = \"private\"\n" + // Variables with ambiguous names are also wrongly hightlighted
-      "    variable = public\n" +
-      "    puts \"Hello\"\n" +
-      "  end\n" +
-      "\n" +
-      "  private\n" +
-      "\n" +
-      "  def is_private()\n" +
-      "    puts \"Hello !\"\n" +
-      "  end\n" +
-      "\n" +
-      "  protected\n" +
-      "\n" +
-      "  def is_protected()\n" +
-      "    puts \"Hello !\"\n" +
-      "  end\n" +
-      "\n" +
-      "  public\n" +
-      "\n" +
-      "  def is_public_again()\n" +
-      "    @protected = \"protected\"\n" + // Attributes with ambiguous names are not hightlighted
-      "  end\n" +
-      "end\n";
+    String source = """
+      class Foo
+        def is_public_by_default()
+          public = "private"
+          variable = public
+          puts "Hello"
+        end
+
+        private
+
+        def is_private()
+          puts "Hello !"
+        end
+
+        protected
+
+        def is_protected()
+          puts "Hello !"
+        end
+
+        public
+
+        def is_public_again()
+          @protected = "protected"
+        end
+      end
+      """;
     InputFile inputFile = createInputFile("file_with_modifiers.rb", source);
     context.fileSystem().add(inputFile);
     sensor(checkFactory()).execute(context);

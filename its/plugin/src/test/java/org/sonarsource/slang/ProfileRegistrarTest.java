@@ -117,7 +117,7 @@ public class ProfileRegistrarTest {
     // This rule is registered by the TestProfileRegistrar in the test-plugin
     var testRules = rulesResponse.getRulesList().stream()
       .filter(rule -> "ruby-test:TEST001".equals(rule.getKey()))
-      .collect(Collectors.toList());
+      .toList();
 
     assertThat(testRules)
       .as("Rule ruby-test:TEST001 should be registered in the default Ruby profile by TestProfileRegistrar")

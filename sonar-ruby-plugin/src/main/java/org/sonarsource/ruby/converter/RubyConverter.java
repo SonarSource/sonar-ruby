@@ -126,13 +126,13 @@ public class RubyConverter implements ASTConverter {
     List<Comment> comments = rubyComments.stream()
       .map(rubyComment -> new CommentAdapter(runtime, rubyComment))
       .map(CommentAdapter::toSlangComment)
-      .collect(Collectors.toList());
+      .toList();
     List<Token> tokens = rubyTokens.stream()
       .map(rubyToken -> new TokenAdapter(runtime, (RubyArrayTwoObject) rubyToken))
       .filter(tokenAdapter -> !COMMENT_TOKEN_TYPE.equals(tokenAdapter.getTokenType().asJavaString()))
       .map(TokenAdapter::toSlangToken)
       .filter(Objects::nonNull)
-      .collect(Collectors.toList());
+      .toList();
     TreeMetaDataProvider metaDataProvider = new TreeMetaDataProvider(comments, tokens);
 
     if (tokens.isEmpty() && comments.isEmpty()) {

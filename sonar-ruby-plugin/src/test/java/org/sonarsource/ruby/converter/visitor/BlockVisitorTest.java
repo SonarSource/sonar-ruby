@@ -31,13 +31,13 @@ class BlockVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void explicit_begin_block() {
-    BlockTree tree = (BlockTree) rubyStatement("" +
-      "begin\n" +
-      "  1\n" +
-      "  begin\n" +
-      "    2; 3;\n" +
-      "  end\n" +
-      "end");
+    BlockTree tree = (BlockTree) rubyStatement("""
+      begin
+        1
+        begin
+          2; 3;
+        end
+      end""");
 
     assertTree(tree).isBlock(LiteralTree.class, BlockTree.class);
     assertRange(tree.textRange()).hasRange(1, 0, 6, 3);
