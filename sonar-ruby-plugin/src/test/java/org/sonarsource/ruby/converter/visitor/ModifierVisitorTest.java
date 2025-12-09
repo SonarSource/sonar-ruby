@@ -29,17 +29,18 @@ class ModifierVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void test() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Foo\n" +
-      "  def public_function(a)\n" +
-      "    puts \"Hello\"\n" +
-      "  end\n" +
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Foo
+        def public_function(a)
+          puts "Hello"
+        end
 
-      "  private\n" +
+        private
 
-      "  def is_no\n" +
-      "    puts \"Hello!\"\n" +
-      "  end\n" +
-      "end");
+        def is_no
+          puts "Hello!"
+        end
+      end""");
 
     NativeTree nativeClassTree = (NativeTree) tree.children().get(0);
     assertThat(nativeClassTree.nativeKind()).isEqualTo(nativeKind("class"));
@@ -56,18 +57,19 @@ class ModifierVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void testInlinePrivate() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Foo\n" +
-            "  private def pick_coder(coder)\n" +
-            "    case coder\n" +
-            "    when nil, \"json\"\n" +
-            "      ActiveSupport::JSON\n" +
-            "    when \"custom\"\n" +
-            "      DummyEncoder\n" +
-            "    when \"none\"\n" +
-            "      nil\n" +
-            "    end\n" +
-            "  end\n" +
-            "end");
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Foo
+        private def pick_coder(coder)
+          case coder
+          when nil, "json"
+            ActiveSupport::JSON
+          when "custom"
+            DummyEncoder
+          when "none"
+            nil
+          end
+        end
+      end""");
 
     NativeTree nativeClassTree = (NativeTree) tree.children().get(0);
     assertThat(nativeClassTree.nativeKind()).isEqualTo(nativeKind("class"));
@@ -83,26 +85,27 @@ class ModifierVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void testMultiplePrivate() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Foo\n" +
-      "  private\n" +
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Foo
+        private
 
-      "  def private1\n" +
-      "    puts \"Hello!\"\n" +
-      "  end\n" +
+        def private1
+          puts "Hello!"
+        end
 
-      "  public\n" +
+        public
 
-      "  def public1\n" +
-      "    puts \"Hello!\"\n" +
-      "  end\n" +
+        def public1
+          puts "Hello!"
+        end
 
-      "  private\n" +
+        private
 
-      "  def private2\n" +
-      "    puts \"Hello!\"\n" +
-      "  end\n" +
+        def private2
+          puts "Hello!"
+        end
 
-      "end");
+      end""");
 
     NativeTree nativeClassTree = (NativeTree) tree.children().get(0);
     BlockTree blockTree = (BlockTree) nativeClassTree.children().get(1);
@@ -113,16 +116,17 @@ class ModifierVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void testPublicPrivate() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Foo\n" +
-      "  private\n" +
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Foo
+        private
 
-      "  public\n" +
+        public
 
-      "  def public\n" +
-      "    puts \"Hello!\"\n" +
-      "  end\n" +
+        def public
+          puts "Hello!"
+        end
 
-      "end");
+      end""");
 
     NativeTree nativeClassTree = (NativeTree) tree.children().get(0);
     BlockTree blockTree = (BlockTree) nativeClassTree.children().get(1);
@@ -132,21 +136,22 @@ class ModifierVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void testPrivateInInnerClass() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Foo\n" +
-      "  class Inner\n" +
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Foo
+        class Inner
 
-      "    def inner_public(a)\n" +
-      "      puts \"Hello!\"\n" +
-      "    end\n" +
+          def inner_public(a)
+            puts "Hello!"
+          end
 
-      "    private\n" +
+          private
 
-      "    def inner_private(a)\n" +
-      "      puts \"Hello!\"\n" +
-      "    end\n" +
+          def inner_private(a)
+            puts "Hello!"
+          end
 
-      "  end\n" +
-      "end");
+        end
+      end""");
 
     NativeTree nativeClassTree = (NativeTree) tree.children().get(0);
     ClassDeclarationTree innerClassDeclarationTree = (ClassDeclarationTreeImpl) nativeClassTree.children().get(1);
@@ -159,14 +164,15 @@ class ModifierVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void testProtected() {
-    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("class Foo\n" +
-      "  protected\n" +
+    ClassDeclarationTree tree = (ClassDeclarationTree) rubyStatement("""
+      class Foo
+        protected
 
-      "  def protected\n" +
-      "    puts \"Hello!\"\n" +
-      "  end\n" +
+        def protected
+          puts "Hello!"
+        end
 
-      "end");
+      end""");
 
     NativeTree nativeClassTree = (NativeTree) tree.children().get(0);
     BlockTree blockTree = (BlockTree) nativeClassTree.children().get(1);

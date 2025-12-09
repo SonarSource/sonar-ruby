@@ -102,9 +102,7 @@ public class RuboCopRuleDefinition {
       rule.description = StringEscapeUtils.escapeHtml4(entry.getValue().get("Description").asText());
       rule.url = BASE_URL + rule.key;
       switch (category) {
-        case "Naming":
-        case "Layout":
-        case "Migration":
+        case "Naming", "Layout", "Migration":
           rule.type = "CODE_SMELL";
           rule.severity = "INFO";
           break;

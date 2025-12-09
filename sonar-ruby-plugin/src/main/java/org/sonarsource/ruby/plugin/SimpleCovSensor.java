@@ -143,8 +143,8 @@ public class SimpleCovSensor implements Sensor {
       int line = i + 1;
       Integer currentHits = fileCoverage.getOrDefault(line, 0);
       // Hits can be a Long (coverage data available), null or "ignored".
-      if (hits instanceof Long) {
-        fileCoverage.put(line, mergeHitsForLine(((Long) hits).intValue(), currentHits));
+      if (hits instanceof Long longHits) {
+        fileCoverage.put(line, mergeHitsForLine((longHits).intValue(), currentHits));
       } else if (hits == null) {
         fileCoverage.put(line, mergeHitsForLine(null, currentHits));
       }

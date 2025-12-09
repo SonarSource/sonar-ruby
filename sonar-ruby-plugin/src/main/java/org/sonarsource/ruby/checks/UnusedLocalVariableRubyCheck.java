@@ -42,7 +42,7 @@ public class UnusedLocalVariableRubyCheck extends UnusedLocalVariableCheck {
 
       List<IdentifierTree> unusedVariables = variableIdentifiers.stream()
         .filter(variable -> identifierTrees.stream().noneMatch(identifier -> SyntacticEquivalence.areEquivalent(variable, identifier)))
-        .collect(Collectors.toList());
+        .toList();
 
       if (unusedVariables.isEmpty()) {
         return;
