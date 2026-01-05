@@ -41,11 +41,14 @@ You can also build and run only Ruling Tests using the `ruling` property:
 ## License headers
 
 License headers are automatically updated by the spotless plugin but only for Java files.
-Furthermore, there are files such as `package-info.java` and `module-info.java` that spotless ignores. 
+Furthermore, there are files such as `package-info.java` and `module-info.java` that spotless ignores.  For those files use a manual script like below to update the license. E.g. on Mac:
+
+    `find . -type f -name "*-info.java" -exec sed -i '' 's/2018-2025/2018-2026/' "{}" \;`
+
 
 ## License
 
-Copyright 2018-2025 SonarSource.
+Copyright 2018-2026 SonarSource.
 
 SonarQube analyzers released after November 29, 2024, including patch fixes for prior versions,
 are published under the [Sonar Source-Available License Version 1 (SSALv1)](LICENSE).
