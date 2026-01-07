@@ -36,6 +36,8 @@ jobs:
           deploy-pull-request: true
           artifactory-reader-role: private-reader    # Override for public repo using private access
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
+          use-develocity: true
+          develocity-url: https://develocity-public.sonar.build/
 
   qa:
     needs: [build]
