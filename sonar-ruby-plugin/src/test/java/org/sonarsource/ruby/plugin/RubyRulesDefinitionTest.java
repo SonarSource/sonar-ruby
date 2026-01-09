@@ -58,7 +58,7 @@ class RubyRulesDefinitionTest {
 
     RulesDefinition.Rule rule = repository.rule("S1313");
     assertThat(rule).isNotNull();
-    assertThat(rule.securityStandards()).containsExactlyInAnyOrder("owaspTop10:a3", "owaspTop10-2021:a1");
+    assertThat(rule.securityStandards()).containsExactlyInAnyOrder("owaspTop10:a3", "owaspTop10-2021:a1", "cwe:547");
   }
 
   @Test
@@ -67,7 +67,7 @@ class RubyRulesDefinitionTest {
 
     RulesDefinition.Rule rule = repository.rule("S1313");
     assertThat(rule).isNotNull();
-    assertThat(rule.securityStandards()).containsExactly("owaspTop10:a3");
+    assertThat(rule.securityStandards()).containsExactly("cwe:547", "owaspTop10:a3");
   }
 
   private RulesDefinition.Repository getRepositoryForVersion(Version version) {
