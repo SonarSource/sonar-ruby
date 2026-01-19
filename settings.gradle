@@ -6,11 +6,17 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.gradle.develocity' version '3.18.2'
+    id("com.gradle.develocity") version "3.18.2"
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "2.2.1"
 }
 
 develocity {
     server = 'https://develocity-public.sonar.build'
+    buildScan {
+        capture {
+        buildLogging = !startParameter.taskNames.contains("properties")
+        }
+    }
 }
 
 def isCI = System.getenv('CI') != null
