@@ -40,11 +40,13 @@ jobs:
         id: build-step
         env:
           DEVELOCITY_ACCESS_KEY: develocity.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
+          DEVELOCITY_URL: "https://develocity-public.sonar.build/"
         with:
           deploy-pull-request: true
           artifactory-reader-role: private-reader    # Override for public repo using private access
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
           use-develocity: true
+          develocity-url: ${{ env.DEVELOCITY_URL }}
   qa:
     needs: [build]
     if: ${{ needs.build.outputs.deployed }}
@@ -87,10 +89,12 @@ jobs:
         with:
           artifactory-reader-role: private-reader
           use-develocity: true
+          develocity-url: ${{ env.DEVELOCITY_URL }}
       - name: Run QA Tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
           DEVELOCITY_ACCESS_KEY: develocity.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
+          DEVELOCITY_URL: "https://develocity-public.sonar.build/"
           SUITE: ${{ matrix.item.suite }}
           SQ_VERSION: ${{ matrix.item.sq_version }}
         run: |
