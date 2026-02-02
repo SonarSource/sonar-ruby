@@ -39,8 +39,8 @@ jobs:
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         id: build-step
         env:
-          DEVELOCITY_ACCESS_KEY: "develocity-public.sonar.build=" ${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
-          DEVELOCITY_URL: "https://develocity-public.sonar.build/"
+          DEVELOCITY_ACCESS_KEY: develocity-public.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
+          DEVELOCITY_URL: https://develocity-public.sonar.build/
         with:
           deploy-pull-request: true
           artifactory-reader-role: private-reader    # Override for public repo using private access
@@ -85,6 +85,9 @@ jobs:
             development/github/token/licenses-ro token | GITHUB_TOKEN;
             development/kv/data/develocity token | develocity_token;
       - name: Configure Gradle
+        env:
+          DEVELOCITY_ACCESS_KEY: develocity-public.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
+          DEVELOCITY_URL: https://develocity-public.sonar.build/
         uses: SonarSource/ci-github-actions/config-gradle@v1
         with:
           artifactory-reader-role: private-reader
@@ -93,8 +96,8 @@ jobs:
       - name: Run QA Tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-          DEVELOCITY_ACCESS_KEY: "develocity-public.sonar.build=" ${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
-          DEVELOCITY_URL: "https://develocity-public.sonar.build/"
+          DEVELOCITY_ACCESS_KEY: develocity-public.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
+          DEVELOCITY_URL: https://develocity-public.sonar.build/
           SUITE: ${{ matrix.item.suite }}
           SQ_VERSION: ${{ matrix.item.sq_version }}
         run: |
