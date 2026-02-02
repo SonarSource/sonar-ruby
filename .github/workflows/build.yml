@@ -15,6 +15,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  USE_DEVELOCITY: true
+  DEVELOCITY_URL: https://develocity-public.sonar.build/
+
 jobs:
   build:
     runs-on: github-ubuntu-latest-s  # Public repository runner
@@ -36,6 +40,8 @@ jobs:
           deploy-pull-request: true
           artifactory-reader-role: private-reader    # Override for public repo using private access
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
+          use-develocity: ${{ env.USE_DEVELOCITY }}
+          develocity-url: ${{ env.DEVELOCITY_URL }}
 
   qa:
     needs: [build]
@@ -66,6 +72,7 @@ jobs:
         run: rm -r ./its/sources/kotlin
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
+          cache_save: false
           version: 2025.7.12
       - name: Get GitHub Token for QA Licenses
         id: secrets
@@ -77,6 +84,8 @@ jobs:
         uses: SonarSource/ci-github-actions/config-gradle@v1
         with:
           artifactory-reader-role: private-reader
+          use-develocity: ${{ env.USE_DEVELOCITY }}
+          develocity-url: ${{ env.DEVELOCITY_URL }}
       - name: Run QA Tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
