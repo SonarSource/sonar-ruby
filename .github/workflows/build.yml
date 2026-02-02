@@ -15,6 +15,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  USE_DEVELOCITY: true
+  DEVELOCITY_URL: https://develocity-public.sonar.build/
+
 jobs:
   build:
     runs-on: github-ubuntu-latest-s  # Public repository runner
@@ -30,23 +34,15 @@ jobs:
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
           version: 2025.7.12
-      - name: Get secrets
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/kv/data/develocity token | develocity_token;
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         id: build-step
-        env:
-          DEVELOCITY_ACCESS_KEY: develocity-public.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
-          DEVELOCITY_URL: https://develocity-public.sonar.build/
         with:
           deploy-pull-request: true
           artifactory-reader-role: private-reader    # Override for public repo using private access
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
-          use-develocity: true
+          use-develocity: ${{ env.USE_DEVELOCITY }}
           develocity-url: ${{ env.DEVELOCITY_URL }}
+
   qa:
     needs: [build]
     if: ${{ needs.build.outputs.deployed }}
@@ -76,6 +72,7 @@ jobs:
         run: rm -r ./its/sources/kotlin
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
+          cache_save: false
           version: 2025.7.12
       - name: Get GitHub Token for QA Licenses
         id: secrets
@@ -83,21 +80,15 @@ jobs:
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
-            development/kv/data/develocity token | develocity_token;
       - name: Configure Gradle
-        env:
-          DEVELOCITY_ACCESS_KEY: develocity-public.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
-          DEVELOCITY_URL: https://develocity-public.sonar.build/
         uses: SonarSource/ci-github-actions/config-gradle@v1
         with:
           artifactory-reader-role: private-reader
-          use-develocity: true
+          use-develocity: ${{ env.USE_DEVELOCITY }}
           develocity-url: ${{ env.DEVELOCITY_URL }}
       - name: Run QA Tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-          DEVELOCITY_ACCESS_KEY: develocity-public.sonar.build=${{ fromJSON(steps.secrets.outputs.vault).develocity_token }}
-          DEVELOCITY_URL: https://develocity-public.sonar.build/
           SUITE: ${{ matrix.item.suite }}
           SQ_VERSION: ${{ matrix.item.sq_version }}
         run: |
