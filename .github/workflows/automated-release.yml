@@ -74,4 +74,5 @@ jobs:
       use-jira-sandbox: ${{ github.event.inputs.dry-run == 'true' }}
       is-draft-release: ${{ github.event.inputs.dry-run == 'true' }}
       bump-version: true
+      bump-version-normalize: true
       issue-categories: ${{ github.event.inputs.issue-categories }}
