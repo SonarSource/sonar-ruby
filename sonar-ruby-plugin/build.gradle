@@ -74,10 +74,11 @@ tasks.register("unpackDependencyGems") {
         extractionDir.mkdirs()
 
         configurations.gems.files.each { gemFile ->
+            def gemExtractionDir = new File(extractionDir, gemFile.name)
             copy {
                 from tarTree(gemFile)
                 include "data.tar.gz"
-                into extractionDir
+                into gemExtractionDir
             }
         }
 
