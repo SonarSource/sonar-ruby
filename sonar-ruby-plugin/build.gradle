@@ -8,6 +8,7 @@ buildscript{
         // The JRuby plugin requires grolifant version 0.12. This has become unavailable,
         // however, we can substitute it with version 0.12.1.
         classpath('org.ysb33r.gradle:grolifant:0.17.0')
+        classpath('com.github.jruby-gradle:jruby-gradle-plugin:2.0.2')
     }
 
     // Workaround for missing transitive dependency on okhttp-digest-1.10.
@@ -25,6 +26,8 @@ buildscript{
 plugins {
     id 'com.gradleup.shadow' version '9.0.1'
 }
+
+apply plugin: 'com.github.jruby-gradle.base'
 
 import com.github.jrubygradle.JRubyPrepare
 
