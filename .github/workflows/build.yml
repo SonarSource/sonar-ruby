@@ -67,8 +67,11 @@ jobs:
       BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          submodules: ${{ matrix.item.suite == 'ruling' }}
+      - name: Initialize required shared build logic submodule
+        run: git submodule update --init -- build-logic/common
+      - name: Initialize test sources submodule for ruling tests
+        if: ${{ matrix.item.suite == 'ruling' }}
+        run: git submodule update --init -- its/sources
       - name: Remove kotlin ITs as they are not relevant for ruling tests (and cause issues with wrapper validation)
         if: ${{ matrix.item.suite == 'ruling' }}
         run: rm -r ./its/sources/kotlin
