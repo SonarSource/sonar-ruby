@@ -15,11 +15,6 @@ on:
         description: "New version to release (without -SNAPSHOT; if left empty, the current minor version will be auto-incremented)"
         required: false
         type: string
-      rule-props-changed:
-        description: >
-          "@RuleProperty" changed? See SC-4654
-        type: boolean
-        default: false
       verbose:
         description: "Enable verbose logging"
         type: boolean
@@ -40,11 +35,10 @@ on:
         description: "Create SLI ticket (SonarLint for IntelliJ)"
         type: boolean
         default: true
-      issue-categories:
-        description: "Jira issue categories to include in the release notes"
-        required: false
-        type: string
-        default: "New Feature,False Positive,False Negative,Bug,Improvement,Task"
+      bump-version:
+        description: "Create PR to bump the next iteration version"
+        type: boolean
+        default: true
 
 jobs:
   release:
@@ -61,7 +55,7 @@ jobs:
       plugin-name: "ruby"
       jira-project-key: "SONARRUBY"
       runner-environment: "github-ubuntu-latest-s"
-      rule-props-changed: ${{ github.event.inputs.rule-props-changed }}
+      rule-props-changed: false
       short-description: ${{ github.event.inputs.short-description }}
       new-version: ${{ github.event.inputs.new-version }}
       sqc-integration: ${{ github.event.inputs.sqc-integration == 'true' }}
@@ -69,9 +63,10 @@ jobs:
       create-sli-ticket: ${{ github.event.inputs.sli-integration == 'true' }}
       branch: ${{ github.event.inputs.branch }}
       pm-email: "jean.jimbo@sonarsource.com"
-      slack-channel: "squad-jvm-notifs"
+      slack-channel: "squad-jvm-releases"
       verbose: ${{ github.event.inputs.verbose == 'true' }}
       use-jira-sandbox: ${{ github.event.inputs.dry-run == 'true' }}
       is-draft-release: ${{ github.event.inputs.dry-run == 'true' }}
-      bump-version: true
-      issue-categories: ${{ github.event.inputs.issue-categories }}
+      issue-categories: "Feature,False Positive,False Negative,Bug,Security,Maintenance"
+      bump-version: ${{ github.event.inputs.bump-version == 'true' }}
+      bump-version-normalize: true
