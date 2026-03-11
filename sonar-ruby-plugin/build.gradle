@@ -1,33 +1,6 @@
-buildscript{
-    // This block is added to work around dependency issues with the aging JRuby plugin.
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        // The JRuby plugin requires grolifant version 0.12. This has become unavailable,
-        // however, we can substitute it with version 0.12.1.
-        classpath('org.ysb33r.gradle:grolifant:0.17.0')
-    }
-
-    // Workaround for missing transitive dependency on okhttp-digest-1.10.
-    // https://github.com/rburgst/okhttp-digest/issues/86#issuecomment-2240821581
-    configurations.classpath {
-        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group == 'com.burgstaller' && details.requested.name == 'okhttp-digest' && details.requested.version == '1.10') {
-                details.useTarget "io.github.rburgst:${details.requested.name}:1.21"
-                details.because 'Dependency has moved'
-            }
-        }
-    }
-}
-
 plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.0'
-    id 'com.github.jruby-gradle.base' version '2.0.2'
 }
-
-import com.github.jrubygradle.JRubyPrepare
 
 ext {
     rubygemsRaccVersion = '1.8.1-java'
@@ -35,8 +8,12 @@ ext {
     rubygemsParserVersion = '3.3.10.0'
 }
 
+configurations {
+    gems
+}
+
 processResources.duplicatesStrategy = DuplicatesStrategy.INCLUDE
-processResources.from("src/main/resources", "${getLayout().getBuildDirectory()}/dependency_gems/gems")
+processResources.from("src/main/resources", layout.buildDirectory.dir("dependency_gems/gems"))
 
 dependencies {
     compileOnly libs.sonar.plugin.api
@@ -46,16 +23,10 @@ dependencies {
     implementation libs.slang.checks
     implementation libs.slang.api
     implementation project(path: ':jruby-repackaged', configuration: 'shadow')
-    // The plugin "com.github.jruby-gradle.jar" is broken and not anymore maintained.
-    // For example, given the following definition:
-    //   gems "rubygems:racc:1.5.2-java"
-    // The plugin will try to download the dependency from:
-    //   http://rubygems-proxy.torquebox.org/releases/rubygems/racc/1.5.2/racc-1.5.2-java.pom
-    // But "rubygems-proxy.torquebox.org" server does not exist anymore.
-    // The bellow function "downloadFromRubygems" is a workaround to this problem
-    gems files("${getLayout().getBuildDirectory()}/rubygems_downloads/racc-${rubygemsRaccVersion}.gem")
-    gems files("${getLayout().getBuildDirectory()}/rubygems_downloads/ast-${rubygemsAstVersion}.gem")
-    gems files("${getLayout().getBuildDirectory()}/rubygems_downloads/parser-${rubygemsParserVersion}.gem")
+    // These gems are bundled explicitly from RubyGems so they can be unpacked and shipped with the plugin.
+    gems files(layout.buildDirectory.file("rubygems_downloads/racc-${rubygemsRaccVersion}.gem"))
+    gems files(layout.buildDirectory.file("rubygems_downloads/ast-${rubygemsAstVersion}.gem"))
+    gems files(layout.buildDirectory.file("rubygems_downloads/parser-${rubygemsParserVersion}.gem"))
 
     testImplementation testLibs.slang.antlr
     testImplementation testLibs.assertj.core
@@ -70,6 +41,7 @@ dependencies {
 }
 
 tasks.register("downloadFromRubygems", Task) {
+    // Download the .gem files directly from rubygems.org before the packaging tasks consume them.
     doLast {
         configurations.gems
           .findAll { !it.exists() }
@@ -85,14 +57,39 @@ tasks.register("downloadFromRubygems", Task) {
     }
 }
 
-tasks.register("unpackDependencyGems", JRubyPrepare) {
-    outputDir "${getLayout().getBuildDirectory()}/dependency_gems"
-    dependencies configurations.gems
+tasks.register("unpackDependencyGems") {
+    def outputDir = layout.buildDirectory.dir("dependency_gems/gems").get().asFile
+    def extractionDir = layout.buildDirectory.dir("tmp/unpackDependencyGems").get().asFile
+    outputs.dir(outputDir)
+    inputs.files(configurations.gems)
+
+    doLast {
+        delete(outputDir, extractionDir)
+        outputDir.mkdirs()
+        extractionDir.mkdirs()
+
+        configurations.gems.files.each { gemFile ->
+            def gemExtractionDir = new File(extractionDir, gemFile.name)
+            copy {
+                from tarTree(gemFile)
+                include "data.tar.gz"
+                into gemExtractionDir
+            }
+        }
+
+        fileTree(extractionDir).matching { include "**/data.tar.gz" }.files.each { dataTarGz ->
+            def gemDirectoryName = dataTarGz.parentFile.name.replaceFirst(/\.gem$/, "")
+            copy {
+                from tarTree(resources.gzip(dataTarGz))
+                into new File(outputDir, gemDirectoryName)
+            }
+        }
+    }
 }
 tasks.register("copyGemsJarsFromDirectoryToShadowBugWorkaroundJar", Jar) {
-    from "${getLayout().getBuildDirectory()}/dependency_gems/gems"
+    from layout.buildDirectory.dir("dependency_gems/gems")
     includes = ['**/*.jar']
-    destinationDirectory = file("${getLayout().getBuildDirectory()}/tmp")
+    destinationDirectory = layout.buildDirectory.dir("tmp")
     archiveFileName = "shadowBugWorkaround.jar"
 }
 
@@ -176,7 +173,7 @@ shadowJar {
     // shadowJar can not embed jar files, it always extract them.
     // https://imperceptiblethoughts.com/shadow/configuration/dependencies/#embedding-jar-files-inside-your-shadow-jar
     // the workaround used here, is to put jar in jar
-    from file("${getLayout().getBuildDirectory()}/tmp/shadowBugWorkaround.jar")
+    from layout.buildDirectory.file("tmp/shadowBugWorkaround.jar")
     exclude 'com/headius/racc/**' // from shadowBugWorkaround.jar
 
     exclude 'javax/**' // com.google.code.findbugs:jsr305
