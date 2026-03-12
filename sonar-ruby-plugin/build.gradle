@@ -41,7 +41,7 @@ dependencies {
 }
 
 tasks.register("downloadFromRubygems", Task) {
-    // Download the .gem files directly from rubygems.org before the packaging tasks consume them.
+    // Download the .gem archives directly from rubygems.org so unpackDependencyGems can extract them.
     doLast {
         configurations.gems
           .findAll { !it.exists() }
@@ -58,6 +58,7 @@ tasks.register("downloadFromRubygems", Task) {
 }
 
 tasks.register("unpackDependencyGems") {
+    // Extract each downloaded .gem into the resource layout bundled into the plugin jar.
     def outputDir = layout.buildDirectory.dir("dependency_gems/gems").get().asFile
     def extractionDir = layout.buildDirectory.dir("tmp/unpackDependencyGems").get().asFile
     outputs.dir(outputDir)
