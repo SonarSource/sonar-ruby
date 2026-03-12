@@ -70,3 +70,4 @@ jobs:
       issue-categories: "Feature,False Positive,False Negative,Bug,Security,Maintenance"
       bump-version: ${{ github.event.inputs.bump-version == 'true' }}
       bump-version-normalize: true
+      check-releasability: false
