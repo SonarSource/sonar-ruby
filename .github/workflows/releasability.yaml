@@ -15,7 +15,7 @@ jobs:
         uses: SonarSource/release-github-actions/slack-message@tt/slack
         with:
           channel: 'tomasz-tylenda-test'
-          text: |
+          message-markdown: |
             # Hello World!
             This is a test message from GitHub Actions.
               - one
