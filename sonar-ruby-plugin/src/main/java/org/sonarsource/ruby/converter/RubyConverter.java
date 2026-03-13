@@ -176,11 +176,18 @@ public class RubyConverter implements ASTConverter {
     URL parserRubygem = RubyConverter.class.getResource(fromRoot(PARSER_RUBYGEM_PATH));
     URL initParserScriptUrl = RubyConverter.class.getResource(fromRoot(SETUP_SCRIPT_PATH));
 
-    Ruby rubyRuntime = JavaEmbedUtils.initialize(Arrays.asList(raccRubygem.toString(), astRubygem.toString(), parserRubygem.toString()));
+    Ruby rubyRuntime = JavaEmbedUtils.initialize(Arrays.asList(
+      toClassLoaderLoadPath(RACC_RUBYGEM_PATH),
+      toClassLoaderLoadPath(AST_RUBYGEM_PATH),
+      toClassLoaderLoadPath(PARSER_RUBYGEM_PATH)));
     System.setProperty("jruby.thread.pool.enabled", "true");
     String initParserScript = new String(getBytes(initParserScriptUrl), UTF_8);
     rubyRuntimeAdapter.eval(rubyRuntime, initParserScript);
     return rubyRuntime;
+  }
+
+  private static String toClassLoaderLoadPath(String path) {
+    return "uri:classloader:/" + path + "/";
   }
 
   private static byte[] getBytes(URL url) throws IOException {
