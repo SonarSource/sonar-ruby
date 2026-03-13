@@ -11,8 +11,6 @@ dependencies {
 }
 
 shadowJar {
-    // Added `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` for Gradle 9.3+ to prevent yGuard from failing on duplicate class definitions (e.g., CheckForNull).
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     exclude 'com/headius/options/example/**'
     exclude 'com/headius/racc/**'
     exclude 'com/jcraft/**'
