@@ -171,9 +171,6 @@ public class RubyConverter implements ASTConverter {
   }
 
   private Ruby initializeRubyRuntime() throws IOException {
-    URL raccRubygem = RubyConverter.class.getResource(fromRoot(RACC_RUBYGEM_PATH));
-    URL astRubygem = RubyConverter.class.getResource(fromRoot(AST_RUBYGEM_PATH));
-    URL parserRubygem = RubyConverter.class.getResource(fromRoot(PARSER_RUBYGEM_PATH));
     URL initParserScriptUrl = RubyConverter.class.getResource(fromRoot(SETUP_SCRIPT_PATH));
 
     Ruby rubyRuntime = JavaEmbedUtils.initialize(Arrays.asList(
