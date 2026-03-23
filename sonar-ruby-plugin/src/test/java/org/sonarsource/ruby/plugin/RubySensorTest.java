@@ -112,6 +112,20 @@ class RubySensorTest extends AbstractSensorTest {
     assertThat(logTester.logs()).contains(String.format("Unable to parse file: %s. Parse error at position 1:2", inputFile.uri()));
   }
 
+  @Test
+  void skip_sensor_when_internal_property_is_enabled() {
+    InputFile inputFile = createInputFile("file1.rb", "{ <!REDECLARATION!>FOO<!>,<!REDECLARATION!>FOO<!> }");
+    context.fileSystem().add(inputFile);
+    context.setSettings(new MapSettings());
+    context.settings().setProperty(RubySensor.SKIP_PROPERTY_KEY, "true");
+
+    sensor(checkFactory("S1764")).execute(context);
+
+    assertThat(context.allAnalysisErrors()).isEmpty();
+    assertThat(context.highlightingTypeAt(inputFile.key(), 1, 0)).isEmpty();
+    assertThat(logTester.logs()).contains("Skipping Ruby sensor because 'sonar.ruby.internal.skipRubySensor' is enabled.");
+  }
+
 
   @Override
   protected String repositoryKey() {
