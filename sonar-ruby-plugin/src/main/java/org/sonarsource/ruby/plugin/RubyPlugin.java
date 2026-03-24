@@ -17,6 +17,7 @@
 package org.sonarsource.ruby.plugin;
 
 import org.sonar.api.Plugin;
+import org.sonar.api.PropertyType;
 import org.sonar.api.SonarProduct;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.config.PropertyDefinition.ConfigScope;
@@ -60,6 +61,16 @@ public class RubyPlugin implements Plugin {
         RuboCopRulesDefinition.class,
         RuboCopSensor.class,
         SimpleCovSensor.class,
+
+        PropertyDefinition.builder(RubySensor.SKIP_PROPERTY_KEY)
+          .defaultValue("true")
+          .name("Internal: Skip Ruby Sensor")
+          .description("Internal property to disable the Ruby sensor. Set to false to re-enable Ruby analysis.")
+          .type(PropertyType.BOOLEAN)
+          .category(RUBY_CATEGORY)
+          .subCategory(GENERAL)
+          .onlyOnConfigScopes(ConfigScope.PROJECT)
+          .build(),
 
         PropertyDefinition.builder(RUBY_FILE_SUFFIXES_KEY)
           .defaultValue(RUBY_FILE_SUFFIXES_DEFAULT_VALUE)

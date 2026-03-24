@@ -21,6 +21,7 @@ import org.sonar.api.Plugin;
 import org.sonar.api.SonarEdition;
 import org.sonar.api.SonarQubeSide;
 import org.sonar.api.SonarRuntime;
+import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.internal.PluginContextImpl;
 import org.sonar.api.internal.SonarRuntimeImpl;
 import org.sonar.api.utils.Version;
@@ -34,7 +35,14 @@ class RubyPluginTest {
     SonarRuntime runtime = SonarRuntimeImpl.forSonarQube(Version.create(7, 9), SonarQubeSide.SERVER, SonarEdition.COMMUNITY);
     Plugin.Context context = new Plugin.Context(runtime);
     new RubyPlugin().define(context);
-    assertThat(context.getExtensions()).hasSize(12);
+    assertThat(context.getExtensions()).hasSize(13);
+    assertThat(context.getExtensions())
+      .filteredOn(PropertyDefinition.class::isInstance)
+      .anySatisfy(extension -> {
+        PropertyDefinition propertyDefinition = (PropertyDefinition) extension;
+        assertThat(propertyDefinition.key()).isEqualTo(RubySensor.SKIP_PROPERTY_KEY);
+        assertThat(propertyDefinition.defaultValue()).isEqualTo("true");
+      });
   }
 
   @Test

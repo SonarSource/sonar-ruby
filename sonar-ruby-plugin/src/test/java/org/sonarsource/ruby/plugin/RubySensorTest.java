@@ -33,6 +33,7 @@ class RubySensorTest extends AbstractSensorTest {
 
   @Test
   void simple_file() {
+    setSkipProperty(false);
     InputFile inputFile = createInputFile("file1.rb", """
       class C
       end
@@ -50,6 +51,7 @@ class RubySensorTest extends AbstractSensorTest {
 
   @Test
   void test_access_modifiers_are_highlighted() {
+    setSkipProperty(false);
     String source = """
       class Foo
         def is_public_by_default()
@@ -95,6 +97,7 @@ class RubySensorTest extends AbstractSensorTest {
 
   @Test
   void test_fail_parsing() {
+    setSkipProperty(false);
     InputFile inputFile = createInputFile("file1.rb", "{ <!REDECLARATION!>FOO<!>,<!REDECLARATION!>FOO<!> }");
     context.fileSystem().add(inputFile);
     CheckFactory checkFactory = checkFactory("S1764");
@@ -113,16 +116,29 @@ class RubySensorTest extends AbstractSensorTest {
   }
 
   @Test
+  void skip_sensor_by_default() {
+    InputFile inputFile = createInputFile("file1.rb", """
+      class C
+      end
+      puts '1 == 1'; puts 'abc'
+      """);
+    context.fileSystem().add(inputFile);
+
+    sensor(checkFactory()).execute(context);
+
+    assertThat(context.highlightingTypeAt(inputFile.key(), 1, 0)).isEmpty();
+    assertThat(logTester.logs()).contains("Skipping Ruby sensor because 'sonar.ruby.internal.skipRubySensor' is enabled.");
+  }
+
+  @Test
   void skip_sensor_when_internal_property_is_enabled() {
     InputFile inputFile = createInputFile("file1.rb", "{ <!REDECLARATION!>FOO<!>,<!REDECLARATION!>FOO<!> }");
     context.fileSystem().add(inputFile);
-    context.setSettings(new MapSettings());
-    context.settings().setProperty(RubySensor.SKIP_PROPERTY_KEY, "true");
+    setSkipProperty(true);
 
     sensor(checkFactory("S1764")).execute(context);
 
     assertThat(context.allAnalysisErrors()).isEmpty();
-    assertThat(context.highlightingTypeAt(inputFile.key(), 1, 0)).isEmpty();
     assertThat(logTester.logs()).contains("Skipping Ruby sensor because 'sonar.ruby.internal.skipRubySensor' is enabled.");
   }
 
@@ -139,6 +155,11 @@ class RubySensorTest extends AbstractSensorTest {
 
   private RubySensor sensor(CheckFactory checkFactory) {
     return new RubySensor(SQ_LTS_RUNTIME, checkFactory, fileLinesContextFactory, new DefaultNoSonarFilter(), language());
+  }
+
+  private void setSkipProperty(boolean skip) {
+    context.setSettings(new MapSettings());
+    context.settings().setProperty(RubySensor.SKIP_PROPERTY_KEY, Boolean.toString(skip));
   }
 
 }

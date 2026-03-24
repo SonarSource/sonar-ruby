@@ -75,7 +75,7 @@ public class RubySensor extends SlangSensor {
   }
 
   private static boolean shouldSkip(Configuration configuration) {
-    return configuration.getBoolean(SKIP_PROPERTY_KEY).orElse(false);
+    return configuration.getBoolean(SKIP_PROPERTY_KEY).orElse(true);
   }
 
 }
