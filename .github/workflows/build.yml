@@ -66,9 +66,16 @@ jobs:
         # Ruling tests check only that the results of analysis have not changed,
         # so one sonar.runtimeVersion is enough.
         item:
-          - { suite: "plugin", sq_version: "DEV" }
-          - { suite: "plugin", sq_version: "LATEST_RELEASE" }
-          - { suite: "ruling", sq_version: "LATEST_RELEASE" }
+          - suite: "plugin"
+            sq_version: "DEV"
+            is_nightly: ${{ github.event_name == 'schedule' }}
+          - suite: "plugin"
+            sq_version: "LATEST_RELEASE"
+          - suite: "ruling"
+            sq_version: "LATEST_RELEASE"
+        exclude:
+          # DEV is tested only in nightly to reduce Repox usage
+          - item: { suite: "plugin", sq_version: "DEV", is_nightly: false }
     env:
       BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
     steps:
