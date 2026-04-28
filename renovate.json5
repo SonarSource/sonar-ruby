@@ -1,0 +1,59 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  extends: [ "github>SonarSource/renovate-config:quality-jvm-squad" ],
+  ignorePaths: [
+    "its/test-plugin/**",
+  ],
+  packageRules: [
+    {
+      // Use semver range updates (not pinning) for SonarSource GitHub Actions.
+      matchManagers: [ "github-actions" ],
+      matchPackagePatterns: [ "^SonarSource/" ],
+      rangeStrategy: "replace"
+    },
+    {
+      matchPackageNames: [
+          "org.sonarsource.api.plugin:sonar-plugin-api*"
+      ],
+      groupName: "sonar-plugin-api",
+      groupSlug: "sonar-plugin-api",
+      prHeader: "**Before updating the plugin-api version, make sure to check the [compatibility matrix](https://github.com/SonarSource/sonar-plugin-api?tab=readme-ov-file#compatibility) and stick to the lowest denominator.**"
+    },
+    {
+      matchPackageNames: [
+          "org.sonarsource.sonarlint.core*",
+          "org.sonarsource.sonarqube*",
+          "org.sonarqube*"
+      ],
+      groupName: "Sonar dependencies",
+      groupSlug: "sonar-dependencies",
+    },
+    {
+      matchPackageNames: [
+        "org.sonarsource.analyzer-commons*",
+      ],
+      groupName: "Analyzer Commons",
+      groupSlug: "analyzer-commons",
+    },
+       {
+      matchPackageNames: [
+        "org.sonarsource.orchestrator*",
+      ],
+      groupName: "Orchestrator",
+      groupSlug: "orchestrator",
+    },
+    {
+      matchManagers: [ "gradle-wrapper" ],
+      matchPackageNames: [ "gradle" ],
+      groupName: "Gradle updates",
+      groupSlug: "gradle-updates",
+    },
+    {
+      matchPackageNames: [
+        "org.sonarsource.slang*",
+      ],
+      groupName: "Slang",
+      groupSlug: "slang",
+    },
+  ],
+}
