@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.gradle.develocity' version '3.18.2'
+    id 'com.gradle.develocity' version '4.4.1'
 }
 
 develocity {
@@ -34,7 +34,7 @@ dependencyResolutionManagement {
     def orchestratorVersion = '6.1.0.3962'
     def sonarlintVersion = '9.8.0.76914'
     // slf4j is provided by SQ, SC or SL, should be aligned with sonar-plugin-api
-    def slf4jApiVersion = '1.7.30'
+    def slf4jApiVersion = '2.0.17'
 
     versionCatalogs {
         libs {
@@ -57,9 +57,9 @@ dependencyResolutionManagement {
             library("slang-testing", "org.sonarsource.slang", "slang-testing").version(slangDependenciesVersion)
             library("mockito-core", "org.mockito", "mockito-core").version("5.13.0")
             library("assertj-core", "org.assertj", "assertj-core").version("3.26.3")
-            library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("5.11.0")
-            library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("5.11.0")
-            library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("1.11.0")
+            library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("6.0.3")
+            library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("6.0.3")
+            library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("6.0.3")
         }
     }
 }
