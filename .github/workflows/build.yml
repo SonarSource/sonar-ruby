@@ -30,7 +30,7 @@ jobs:
       build-number: ${{ steps.build-step.outputs.BUILD_NUMBER }}
       deployed: ${{ steps.build-step.outputs.deployed }}
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Initialize required submodule only
         # INVESTIGATION: Full submodule init pulls 'slang-test-sources', which contains
         # invalid Gradle Wrapper JARs (checksum mismatch).
@@ -39,7 +39,7 @@ jobs:
         # Since this specific action is used here but not in QA (where full clones
         # are safe), we isolate only 'build-logic/common' to pass CI validation.
         run: git submodule update --init -- build-logic/common
-      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
         with:
           version: 2025.7.12
       - uses: SonarSource/ci-github-actions/build-gradle@v1
@@ -79,7 +79,7 @@ jobs:
     env:
       BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Initialize required shared build logic submodule
         run: git submodule update --init -- build-logic/common
       - name: Initialize test sources submodule for ruling tests
@@ -88,7 +88,7 @@ jobs:
       - name: Remove kotlin ITs as they are not relevant for ruling tests (and cause issues with wrapper validation)
         if: ${{ matrix.item.suite == 'ruling' }}
         run: rm -r ./its/sources/kotlin
-      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
         with:
           cache_save: false
           version: 2025.7.12
