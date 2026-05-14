@@ -23,7 +23,6 @@ import org.assertj.core.api.Condition;
 import org.jruby.Ruby;
 import org.jruby.RubyRuntimeAdapter;
 import org.jruby.exceptions.StandardError;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.sonarsource.slang.api.BinaryExpressionTree.Operator;
 import org.sonarsource.slang.api.Comment;
@@ -190,7 +189,7 @@ class RubyConverterTest extends AbstractRubyConverterTest {
   }
 
   @Test
-  void multiline_comments() throws Exception {
+  void multiline_comments() {
     assertComment("=begin\ncomment content\n=end\n", "=begin\ncomment content\n=end\n", "\ncomment content\n",
       TextRanges.range(1, 0, 4, 0),
       TextRanges.range(1, 6, 3, 0));

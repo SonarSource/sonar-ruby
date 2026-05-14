@@ -34,7 +34,7 @@ public class RubySensor extends SlangSensor {
   public RubySensor(SonarRuntime sonarRuntime, CheckFactory checkFactory, FileLinesContextFactory fileLinesContextFactory, NoSonarFilter noSonarFilter, RubyLanguage language) {
     super(sonarRuntime, noSonarFilter, fileLinesContextFactory, language);
     checks = checkFactory.create(RubyPlugin.RUBY_REPOSITORY_KEY);
-    checks.addAnnotatedChecks((Iterable<?>) RubyCheckList.checks());
+    checks.addAnnotatedChecks(RubyCheckList.checks());
   }
 
   @Override
