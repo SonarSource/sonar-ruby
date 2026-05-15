@@ -7,7 +7,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'com.gradle.develocity' version '3.19.2'
+    id 'com.gradle.develocity' version '4.4.1'
 }
 
 develocity {
@@ -57,9 +57,9 @@ dependencyResolutionManagement {
             library("slang-testing", "org.sonarsource.slang", "slang-testing").version(slangDependenciesVersion)
             library("mockito-core", "org.mockito", "mockito-core").version("5.23.0")
             library("assertj-core", "org.assertj", "assertj-core").version("3.27.7")
-            library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("5.14.4")
-            library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("5.14.4")
-            library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("1.14.4")
+            library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("6.0.3")
+            library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("6.0.3")
+            library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("6.0.3")
         }
     }
 }
