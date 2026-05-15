@@ -30,6 +30,8 @@ import org.sonarqube.ws.Issues.Issue;
 import org.sonarqube.ws.client.issues.SearchRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
 public class ExternalReportTest extends TestBase {
 
   private static final String BASE_DIRECTORY = "projects/externalreport/";
@@ -65,6 +67,7 @@ public class ExternalReportTest extends TestBase {
     assertThat(issues.get(2).getMessage()).isEqualTo("Prefer using `YAML.safe_load` over `YAML.load`.");
     assertThat(issues.get(2).getSeverity().name()).isEqualTo("MAJOR");
     assertThat(issues.get(2).getDebt()).isEqualTo("5min");
+    fail("Intentional fail()");
   }
 
   private List<Issue> getExternalIssues(String componentKey) {

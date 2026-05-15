@@ -40,6 +40,7 @@ import org.junit.Test;
 import org.sonarsource.analyzer.commons.ProfileGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class SlangRulingTest {
 
@@ -103,6 +104,7 @@ public class SlangRulingTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("sonar.inclusions", "sources/ruby/**/*.rb, ruling/src/test/resources/sources/ruby/**/*.rb");
     run_ruling_test("ruby", properties);
+    fail("Intentionally fail ruling");
   }
 
   private void run_ruling_test(String project, Map<String, String> projectProperties) throws IOException {

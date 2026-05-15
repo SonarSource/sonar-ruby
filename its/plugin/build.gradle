@@ -4,11 +4,16 @@ dependencies {
     testImplementation testLibs.assertj.core
     testImplementation testLibs.sonarlint.core
     testImplementation testLibs.sonar.orchestrator
+    testImplementation testLibs.junit.jupiter.api
+    testRuntimeOnly testLibs.junit.jupiter.engine
+    testRuntimeOnly testLibs.junit.vintage.engine
+    testRuntimeOnly testLibs.junit.platform.launcher
 }
 
 sonarqube.skipProject = true
 
 test {
+    useJUnitPlatform()
     onlyIf {
         project.hasProperty("plugin") || project.hasProperty("its")
     }
