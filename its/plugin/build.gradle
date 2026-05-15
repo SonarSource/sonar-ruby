@@ -2,7 +2,9 @@ dependencies {
     testImplementation libs.sonar.analyzer.commons
     testImplementation testLibs.sonar.ws
     testImplementation testLibs.assertj.core
+    testImplementation testLibs.awaitility
     testImplementation testLibs.sonarlint.core
+    testImplementation testLibs.sonarlint.core.test.utils
     testImplementation testLibs.sonar.orchestrator
     testImplementation testLibs.junit.jupiter.api
     testRuntimeOnly testLibs.junit.jupiter.engine
@@ -19,7 +21,7 @@ test {
     }
     filter {
         includeTestsMatching 'org.sonarsource.slang.Tests'
-        includeTestsMatching 'org.sonarsource.slang.SonarLintTest'
+        includeTestsMatching 'org.sonarsource.slang.SonarLintIntegrationTest'
     }
     systemProperty 'java.awt.headless', 'true'
     outputs.upToDateWhen { false }
