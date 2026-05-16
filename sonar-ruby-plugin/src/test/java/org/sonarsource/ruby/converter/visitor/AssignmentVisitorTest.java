@@ -31,7 +31,7 @@ import static org.sonarsource.slang.testing.TreeAssert.assertTree;
 class AssignmentVisitorTest extends AbstractRubyConverterTest {
 
   @Test
-  void test() throws Exception {
+  void test() {
     assertTree(rubyStatement("a = 1")).isInstanceOf(VariableDeclarationTree.class);
     assertTree(rubyStatement("a = b")).isInstanceOf(VariableDeclarationTree.class);
 
@@ -52,7 +52,7 @@ class AssignmentVisitorTest extends AbstractRubyConverterTest {
   }
 
   @Test
-  void self_assignment() throws Exception {
+  void self_assignment() {
     VariableDeclarationTree var = (VariableDeclarationTree) rubyStatement("a = a");
     assertTree(var.identifier()).isEquivalentTo(var.initializer());
 
@@ -76,7 +76,7 @@ class AssignmentVisitorTest extends AbstractRubyConverterTest {
   }
 
   @Test
-  void lhs_location() throws Exception {
+  void lhs_location() {
     assertTree(rubyStatement("a = 1")).isInstanceOf(VariableDeclarationTree.class);
     assertTree(rubyStatement("a = 0;a = 1").children().get(1)).isInstanceOf(AssignmentExpressionTree.class);
     assertTree(rubyStatement("a[1, 2] = 1")).isInstanceOf(AssignmentExpressionTree.class);
@@ -144,7 +144,7 @@ class AssignmentVisitorTest extends AbstractRubyConverterTest {
   }
 
   @Test
-  void compound_are_natives() throws Exception {
+  void compound_are_natives() {
     assertThat(((NativeTree) rubyStatement("a -= 1")).nativeKind()).isEqualTo(nativeKind("op_asgn"));
     assertThat(((NativeTree) rubyStatement("a *= 1")).nativeKind()).isEqualTo(nativeKind("op_asgn"));
     assertThat(((NativeTree) rubyStatement("a /= 1")).nativeKind()).isEqualTo(nativeKind("op_asgn"));

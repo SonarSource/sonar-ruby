@@ -155,8 +155,8 @@ public class RubyVisitor {
 
   public Tree visitNode(AstNode node, List<?> children) {
     switch (node.type()) {
-      case "and":
-        return createLogicalOperation(node, children, Operator.CONDITIONAL_AND);
+      case "and", "or":
+        return createLogicalOperation(node, children, "and".equals(node.type()) ? Operator.CONDITIONAL_AND : Operator.CONDITIONAL_OR);
       case "arg", "optarg", "restarg", "kwarg", "kwoptarg", "kwrestarg", "blockarg", "procarg0", "shadowarg":
         // note obj-c arguments are not supported https://github.com/whitequark/parser/blob/master/doc/AST_FORMAT.md#objective-c-arguments
         return createParameterTree(node, children);
@@ -190,14 +190,10 @@ public class RubyVisitor {
         return createFromMlhs(node, children);
       case "op_asgn":
         return createFromOpAsgn(node, children);
-      case "break":
-        return createJumpTree(node, children, JumpKind.BREAK);
-      case "next":
-        return createJumpTree(node, children, JumpKind.CONTINUE);
+      case "break", "next":
+        return createJumpTree(node, children, "break".equals(node.type()) ? JumpKind.BREAK : JumpKind.CONTINUE);
       case "return":
         return createReturnTree(node, children);
-      case "or":
-        return createLogicalOperation(node, children, Operator.CONDITIONAL_OR);
       case "send":
         return createFromSendNode(node, children);
       case "true", "false":
