@@ -71,37 +71,37 @@ class RuboCopSensorTest {
     List<ExternalIssue> externalIssues = executeSensorImporting("rubocop-report.json");
     assertThat(externalIssues).hasSize(4);
 
-    ExternalIssue first = externalIssues.get(0);
-    assertThat(first.primaryLocation().inputComponent().key()).isEqualTo("rubocop-project:useless-assignment.rb");
-    assertThat(first.ruleKey()).hasToString("external_rubocop:Lint/UselessAssignment");
-    assertThat(first.type()).isEqualTo(RuleType.CODE_SMELL);
-    assertThat(first.severity()).isEqualTo(Severity.MAJOR);
-    assertThat(first.primaryLocation().message()).isEqualTo("Lint/UselessAssignment: Useless assignment to variable - `param`.");
-    assertThat(location(first)).isEqualTo("from line 3 offset 2 to line 3 offset 7");
+    assertExternalIssue(externalIssues.get(0),
+      "rubocop-project:useless-assignment.rb",
+      "external_rubocop:Lint/UselessAssignment",
+      RuleType.CODE_SMELL,
+      Severity.MAJOR,
+      "Lint/UselessAssignment: Useless assignment to variable - `param`.",
+      "from line 3 offset 2 to line 3 offset 7");
 
-    ExternalIssue second = externalIssues.get(1);
-    assertThat(second.primaryLocation().inputComponent().key()).isEqualTo("rubocop-project:useless-assignment.rb");
-    assertThat(first.ruleKey()).hasToString("external_rubocop:Lint/UselessAssignment");
-    assertThat(first.type()).isEqualTo(RuleType.CODE_SMELL);
-    assertThat(first.severity()).isEqualTo(Severity.MAJOR);
-    assertThat(first.primaryLocation().message()).isEqualTo("Lint/UselessAssignment: Useless assignment to variable - `param`.");
-    assertThat(location(second)).isEqualTo("from line 130 offset 2 to line 130 offset 7");
+    assertExternalIssue(externalIssues.get(1),
+      "rubocop-project:useless-assignment.rb",
+      "external_rubocop:Lint/UselessAssignment",
+      RuleType.CODE_SMELL,
+      Severity.MAJOR,
+      "Lint/UselessAssignment: Useless assignment to variable - `param`.",
+      "from line 130 offset 2 to line 130 offset 7");
 
-    ExternalIssue third = externalIssues.get(2);
-    assertThat(third.primaryLocation().inputComponent().key()).isEqualTo("rubocop-project:yaml-issue.rb");
-    assertThat(third.ruleKey()).hasToString("external_rubocop:Security/YAMLLoad");
-    assertThat(third.type()).isEqualTo(RuleType.VULNERABILITY);
-    assertThat(third.severity()).isEqualTo(Severity.MAJOR);
-    assertThat(third.primaryLocation().message()).isEqualTo("Security/YAMLLoad: Prefer using `YAML.safe_load` over `YAML.load`.");
-    assertThat(location(third)).isEqualTo("from line 2 offset 7 to line 2 offset 11");
+    assertExternalIssue(externalIssues.get(2),
+      "rubocop-project:yaml-issue.rb",
+      "external_rubocop:Security/YAMLLoad",
+      RuleType.VULNERABILITY,
+      Severity.MAJOR,
+      "Security/YAMLLoad: Prefer using `YAML.safe_load` over `YAML.load`.",
+      "from line 2 offset 7 to line 2 offset 11");
 
-    ExternalIssue fourth = externalIssues.get(3);
-    assertThat(fourth.primaryLocation().inputComponent().key()).isEqualTo("rubocop-project:yaml-issue.rb");
-    assertThat(fourth.ruleKey()).hasToString("external_rubocop:Style/StringLiterals");
-    assertThat(fourth.type()).isEqualTo(RuleType.CODE_SMELL);
-    assertThat(fourth.severity()).isEqualTo(Severity.MINOR);
-    assertThat(fourth.primaryLocation().message()).isEqualTo("Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.");
-    assertThat(location(fourth)).isEqualTo("from line 2 offset 12 to line 2 offset 21");
+    assertExternalIssue(externalIssues.get(3),
+      "rubocop-project:yaml-issue.rb",
+      "external_rubocop:Style/StringLiterals",
+      RuleType.CODE_SMELL,
+      Severity.MINOR,
+      "Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.",
+      "from line 2 offset 12 to line 2 offset 21");
 
     assertNoErrorWarnDebugLogs(logTester);
   }
@@ -229,6 +229,21 @@ class RuboCopSensorTest {
       return RubyPlugin.RUBY_LANGUAGE_KEY;
     }
     return path.substring(path.lastIndexOf('.') + 1);
+  }
+
+  private static void assertExternalIssue(ExternalIssue issue,
+    String expectedComponentKey,
+    String expectedRuleKey,
+    RuleType expectedType,
+    Severity expectedSeverity,
+    String expectedMessage,
+    String expectedLocation) {
+    assertThat(issue.primaryLocation().inputComponent().key()).isEqualTo(expectedComponentKey);
+    assertThat(issue.ruleKey()).hasToString(expectedRuleKey);
+    assertThat(issue.type()).isEqualTo(expectedType);
+    assertThat(issue.severity()).isEqualTo(expectedSeverity);
+    assertThat(issue.primaryLocation().message()).isEqualTo(expectedMessage);
+    assertThat(location(issue)).isEqualTo(expectedLocation);
   }
 
   private static String location(ExternalIssue issue) {

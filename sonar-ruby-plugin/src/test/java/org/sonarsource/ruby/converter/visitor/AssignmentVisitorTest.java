@@ -53,8 +53,8 @@ class AssignmentVisitorTest extends AbstractRubyConverterTest {
 
   @Test
   void self_assignment() throws Exception {
-    VariableDeclarationTree var = (VariableDeclarationTree) rubyStatement("a = a");
-    assertTree(var.identifier()).isEquivalentTo(var.initializer());
+    VariableDeclarationTree varDecl = (VariableDeclarationTree) rubyStatement("a = a");
+    assertTree(varDecl.identifier()).isEquivalentTo(varDecl.initializer());
 
     AssignmentExpressionTree tree = (AssignmentExpressionTree) rubyStatement("A = 1\nA = A").children().get(1);
     assertTree(tree.leftHandSide()).isEquivalentTo(tree.statementOrExpression());

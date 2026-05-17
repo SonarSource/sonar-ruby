@@ -36,5 +36,5 @@ public interface AstNode {
 
   IRubyObject node();
 
-  List availableAttributes();
+  List<Object> availableAttributes();
 }

@@ -45,7 +45,7 @@ class RubySensorTest extends AbstractSensorTest {
     assertThat(context.highlightingTypeAt(inputFile.key(), 1, 5)).isEmpty();
 
     // FIXME
-    //assertThat(logTester.logs()).contains("1 source files to be analyzed");
+    //
   }
 
   @Test

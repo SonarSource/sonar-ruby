@@ -200,8 +200,8 @@ class SimpleCovSensorTest {
     SensorContextTester context = getSensorContext("invalid_resultset.json", "file1.rb");
     sensor.execute(context);
 
-    String expectedMessage = String.format(
-      "Cannot read coverage report file, expecting standard SimpleCov JSON formatter output: 'invalid_resultset.json'");
+    String expectedMessage =
+      "Cannot read coverage report file, expecting standard SimpleCov JSON formatter output: 'invalid_resultset.json'";
     assertThat(logTester.logs()).contains(expectedMessage);
   }
 
