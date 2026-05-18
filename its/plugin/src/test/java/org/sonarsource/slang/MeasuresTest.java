@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.sonarqube.ws.Issues;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 public class MeasuresTest extends TestBase {
 
@@ -41,6 +42,8 @@ public class MeasuresTest extends TestBase {
     List<Issues.Issue> issuesForRule = getIssuesForRule(projectKey, "ruby:S1135");
     assertThat(issuesForRule).extracting(Issues.Issue::getLine).containsExactly(18);
     assertThat(issuesForRule).extracting(Issues.Issue::getComponent).containsExactly(componentKey);
+
+    fail("Intentional fail() to validate CI");
   }
 
 }
