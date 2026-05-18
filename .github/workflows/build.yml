@@ -121,7 +121,7 @@ jobs:
             -Pqa --info --stacktrace --console plain --no-daemon --build-cache
       - name: Upload Test Results on Failure
         if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
           name: report-${{ matrix.item.suite }}-${{ matrix.item.sq_version }}
           path: its/${{ matrix.item.suite }}/build/reports/tests
