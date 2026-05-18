@@ -76,8 +76,10 @@ public class SonarLintIntegrationTest {
 
   /**
    * Initialize {@link #pluginPath}:
-   *  <li>In local environment, use the plugin built on local machine.
-   *  <li>In QA environment in CI, the plugin is downloaded using Maven coordinates.
+   *  <ul>
+   *    <li>In local environment, use the plugin built on local machine.</li>
+   *    <li>In QA environment in CI, the plugin is downloaded using Maven coordinates.</li>
+   *  </ul>
    */
   @BeforeAll
   static void initPluginLocation() {
