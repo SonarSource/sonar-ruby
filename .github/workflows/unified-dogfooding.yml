@@ -13,6 +13,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          version: 2026.4.25
       - name: Initialize build-logic submodule
         run: git submodule update --init build-logic/common
       - uses: SonarSource/ci-github-actions/build-gradle@v1
