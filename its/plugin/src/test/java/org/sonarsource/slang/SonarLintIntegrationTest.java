@@ -107,7 +107,8 @@ public class SonarLintIntegrationTest {
       .containsExactlyInAnyOrder(
         tuple("ruby:S100", new TextRangeDto(1, 4, 1, 10)),
         tuple("ruby:S1145", new TextRangeDto(2, 5, 2, 9)),
-        tuple("ruby:S1481", new TextRangeDto(3, 4, 3, 12))
+        tuple("ruby:S1481", new TextRangeDto(3, 4, 3, 12)),
+        tuple("ruby:S2068", new TextRangeDto(3, 4, 3, 12))
       );
   }
 
