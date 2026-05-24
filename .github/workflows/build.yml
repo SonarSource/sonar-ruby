@@ -41,7 +41,7 @@ jobs:
         run: git submodule update --init -- build-logic/common
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
-          version: 2026.4.28
+          version: 2026.5.12
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         id: build-step
         with:
@@ -91,7 +91,7 @@ jobs:
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
           cache_save: false
-          version: 2026.4.28
+          version: 2026.5.12
       - name: Get GitHub Token for QA Licenses
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
