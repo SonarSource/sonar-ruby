@@ -94,6 +94,7 @@ import static java.util.Collections.singletonList;
 
 public class RubyVisitor {
 
+  private static final String BEGIN_ATTRIBUTE = "begin";
   private static final String KEYWORD_ATTRIBUTE = "keyword";
   private static final List<String> EXCEPTION_BLOCK_TYPES = asList("resbody", "rescue", "ensure");
   private static final Map<String, Operator> BINARY_OPERATOR_MAP;
@@ -160,7 +161,7 @@ public class RubyVisitor {
       case "arg", "optarg", "restarg", "kwarg", "kwoptarg", "kwrestarg", "blockarg", "procarg0", "shadowarg":
         // note obj-c arguments are not supported https://github.com/whitequark/parser/blob/master/doc/AST_FORMAT.md#objective-c-arguments
         return createParameterTree(node, children);
-      case "begin":
+      case BEGIN_ATTRIBUTE:
         return createFromBeginNode(node, children);
       case "kwbegin":
         return createFromKwBeginNode(node, children);
@@ -592,7 +593,7 @@ public class RubyVisitor {
     if (RubyConverter.FILENAME.equals(value)) {
       return createNativeTree(node, children);
     }
-    TextRange begin = node.textRangeForAttribute("begin");
+    TextRange begin = node.textRangeForAttribute(BEGIN_ATTRIBUTE);
     TextRange end = node.textRangeForAttribute("end");
     TreeMetaData treeMetaData;
     if (begin != null && end != null) {
@@ -649,7 +650,7 @@ public class RubyVisitor {
   }
 
   private Tree createFromBeginNode(AstNode node, List<?> children) {
-    Optional<Token> beginToken = lookForTokenByAttribute(node, "begin");
+    Optional<Token> beginToken = lookForTokenByAttribute(node, BEGIN_ATTRIBUTE);
     Optional<Token> endToken = lookForTokenByAttribute(node, "end");
     if (beginToken.isPresent() && endToken.isPresent() && children.size() == 1 && beginToken.get().text().equals("(")) {
       return new ParenthesizedExpressionTreeImpl(metaData(node), ((Tree) children.get(0)), beginToken.get(), endToken.get());
