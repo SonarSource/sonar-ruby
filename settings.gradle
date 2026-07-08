@@ -27,8 +27,9 @@ buildCache {
 }
 
 dependencyResolutionManagement {
-    def slangDependenciesVersion = '1.20.1.7876'
-    def analyzerCommonsVersion = '2.22.0.4796'
+    // TODO update to the released slang version once SONARSLANG-762 (S2068 test-file suppression) is published; 1.21.0.8294 is a pre-release build used for testing.
+    def slangDependenciesVersion = '1.21.0.8294'
+    def analyzerCommonsVersion = '2.27.0.5007'
     def pluginApiVersion = '12.0.0.2960'
     def sonarqubeVersion = '10.7.0.96327'
     def orchestratorVersion = '6.1.0.3962'
