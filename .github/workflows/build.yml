@@ -142,3 +142,24 @@ jobs:
       - uses: SonarSource/ci-github-actions/promote@v1
         with:
           promote-pull-request: true  # Enable PR artifact promotion
+
+  notify_slack:
+    needs:
+      - build
+      - qa
+    if: >-
+      !cancelled() && failure() &&
+      (github.ref_name == 'master' ||
+      startsWith(github.ref_name, 'branch-') ||
+      startsWith(github.ref_name, 'dogfood-'))
+    permissions:
+      id-token: write
+    runs-on: github-ubuntu-latest-s  # Public repository runner
+    steps:
+      # https://github.com/SonarSource/release-github-actions/tree/master/notify-slack
+      - uses: SonarSource/release-github-actions/notify-slack@v1
+        with:
+          project-name: "Sonar-Ruby"
+          icon: ":cyber-radish:"
+          slack-channel: "ops-language-coverage"
+          jobs: ${{ toJSON(needs) }}
