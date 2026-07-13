@@ -54,9 +54,8 @@ public class RubySensor extends SlangSensor {
 
   @Override
   protected String[] testFilePathPatterns() {
-    // Adds RSpec and minitest conventions to the inherited test directories, so the heuristic
-    // recognises Ruby test files even when "sonar.tests" is not configured.
-    return new String[] {"**/test/**", "**/tests/**", "**/spec/**", "**/*_spec.rb", "**/*_test.rb"};
+    // Common test-suite filename patterns (RSpec, minitest) to be used when "sonar.tests" is not configured.
+    return new String[] {"**/*_spec.rb", "**/*_test.rb"};
   }
 
 }

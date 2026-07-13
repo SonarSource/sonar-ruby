@@ -18,6 +18,8 @@ package org.sonarsource.ruby.plugin;
 
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.TextPointer;
 import org.sonar.api.batch.rule.CheckFactory;
@@ -114,13 +116,14 @@ class RubySensorTest extends AbstractSensorTest {
   }
 
 
-  @Test
-  void hardcoded_credentials_suppressed_on_heuristic_test_file() {
+  @ParameterizedTest
+  @ValueSource(strings = {"config_spec.rb", "config_test.rb"})
+  void hardcoded_credentials_suppressed_on_heuristic_test_file(String testFileName) {
     String source = "password = \"aX9!zQ2m#Lp7\"\n";
     InputFile mainFile = createInputFile("lib/config.rb", source);
-    InputFile specFile = createInputFile("spec/config_spec.rb", source);
+    InputFile testFile = createInputFile("lib/" + testFileName, source);
     context.fileSystem().add(mainFile);
-    context.fileSystem().add(specFile);
+    context.fileSystem().add(testFile);
     sensor(checkFactory("S2068")).execute(context);
 
     Collection<Issue> issues = context.allIssues();

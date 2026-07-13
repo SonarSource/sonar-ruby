@@ -60,6 +60,7 @@ dependencyResolutionManagement {
             library("assertj-core", "org.assertj", "assertj-core").version("3.27.7")
             library("awaitility", "org.awaitility", "awaitility").version("4.3.0")
             library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("6.0.3")
+            library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").version("6.0.3")
             library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("6.0.3")
             library("junit-vintage-engine", "org.junit.vintage", "junit-vintage-engine").version("6.0.3")
             library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("6.0.3")
