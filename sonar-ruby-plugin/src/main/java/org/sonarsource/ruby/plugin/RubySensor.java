@@ -52,4 +52,10 @@ public class RubySensor extends SlangSensor {
     return RubyPlugin.RUBY_REPOSITORY_KEY;
   }
 
+  @Override
+  protected String[] testFilePathPatterns() {
+    // Common test-suite filename patterns (RSpec, minitest) to be used when "sonar.tests" is not configured.
+    return new String[] {"**/*_spec.rb", "**/*_test.rb"};
+  }
+
 }

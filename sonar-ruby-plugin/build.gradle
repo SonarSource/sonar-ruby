@@ -39,6 +39,7 @@ dependencies {
     testImplementation testLibs.mockito.core
     testImplementation testLibs.slang.testing
     testImplementation testLibs.junit.jupiter.api
+    testImplementation testLibs.junit.jupiter.params
     testImplementation testLibs.sonar.plugin.api.impl
     testImplementation testLibs.sonar.plugin.api.test.fixtures
 

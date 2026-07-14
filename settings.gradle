@@ -27,8 +27,8 @@ buildCache {
 }
 
 dependencyResolutionManagement {
-    def slangDependenciesVersion = '1.20.1.7876'
-    def analyzerCommonsVersion = '2.22.0.4796'
+    def slangDependenciesVersion = '1.21.0.8303'
+    def analyzerCommonsVersion = '2.27.0.5007'
     def pluginApiVersion = '12.0.0.2960'
     def sonarqubeVersion = '10.7.0.96327'
     def orchestratorVersion = '6.1.0.3962'
@@ -60,6 +60,7 @@ dependencyResolutionManagement {
             library("assertj-core", "org.assertj", "assertj-core").version("3.27.7")
             library("awaitility", "org.awaitility", "awaitility").version("4.3.0")
             library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("6.0.3")
+            library("junit-jupiter-params", "org.junit.jupiter", "junit-jupiter-params").version("6.0.3")
             library("junit-jupiter-engine", "org.junit.jupiter", "junit-jupiter-engine").version("6.0.3")
             library("junit-vintage-engine", "org.junit.vintage", "junit-vintage-engine").version("6.0.3")
             library("junit-platform-launcher", "org.junit.platform", "junit-platform-launcher").version("6.0.3")

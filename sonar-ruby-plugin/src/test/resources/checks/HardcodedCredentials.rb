@@ -1,5 +1,5 @@
-x = "user=admin&password=Admin123"; # Noncompliant
-user_password = "Admin123"; # Noncompliant
+x = "user=admin&password=x7Kpk2mL9qRzVn"; # Noncompliant
+user_password = "x7Kpk2mL9qRzVn"; # Noncompliant
 
 user_password = GetPassword();
 password = "login=a&password=#{user_password}"; # Compliant

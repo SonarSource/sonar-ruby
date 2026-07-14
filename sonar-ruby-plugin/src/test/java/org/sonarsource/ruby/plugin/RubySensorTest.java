@@ -18,11 +18,14 @@ package org.sonarsource.ruby.plugin;
 
 import java.util.Collection;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.TextPointer;
 import org.sonar.api.batch.rule.CheckFactory;
 import org.sonar.api.batch.sensor.error.AnalysisError;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
+import org.sonar.api.batch.sensor.issue.Issue;
 import org.sonar.api.batch.sensor.issue.internal.DefaultNoSonarFilter;
 import org.sonar.api.config.internal.MapSettings;
 import org.sonarsource.slang.testing.AbstractSensorTest;
@@ -112,6 +115,21 @@ class RubySensorTest extends AbstractSensorTest {
     assertThat(logTester.logs()).contains(String.format("Unable to parse file: %s. Parse error at position 1:2", inputFile.uri()));
   }
 
+
+  @ParameterizedTest
+  @ValueSource(strings = {"config_spec.rb", "config_test.rb"})
+  void hardcoded_credentials_suppressed_on_heuristic_test_file(String testFileName) {
+    String source = "password = \"aX9!zQ2m#Lp7\"\n";
+    InputFile mainFile = createInputFile("lib/config.rb", source);
+    InputFile testFile = createInputFile("lib/" + testFileName, source);
+    context.fileSystem().add(mainFile);
+    context.fileSystem().add(testFile);
+    sensor(checkFactory("S2068")).execute(context);
+
+    Collection<Issue> issues = context.allIssues();
+    assertThat(issues).hasSize(1);
+    assertThat(issues.iterator().next().primaryLocation().inputComponent()).isEqualTo(mainFile);
+  }
 
   @Override
   protected String repositoryKey() {
