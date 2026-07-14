@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/simplecov-ruby/simplecov/main/schemas/coverage-v1.0.schema.json",
+  "meta": {
+    "schema_version": "1.0",
+    "simplecov_version": "1.0.0",
+    "command_name": "RSpec",
+    "primary_coverage": "line",
+    "line_coverage": true,
+    "branch_coverage": false,
+    "method_coverage": false
+  },
+  "total": {
+    "lines": {
+      "covered": 4,
+      "missed": 1,
+      "omitted": 2,
+      "total": 5,
+      "percent": 80.0
+    }
+  },
+  "coverage": {
+    "file1.rb": {
+      "lines": [
+        1,
+        1,
+        2,
+        null,
+        "ignored",
+        1,
+        0
+      ],
+      "branches": [
+      ]
+    }
+  },
+  "groups": {},
+  "errors": {}
+}
