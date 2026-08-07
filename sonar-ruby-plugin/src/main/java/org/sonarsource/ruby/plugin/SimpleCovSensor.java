@@ -89,7 +89,9 @@ public class SimpleCovSensor implements Sensor {
 
     for (Entry<String, Map<Integer, Integer>> coverageForFile : mergedCoverages.entrySet()) {
       String filePath = coverageForFile.getKey();
-      InputFile inputFile = fileSystem.inputFile(predicates.hasAbsolutePath(filePath));
+      // SimpleCov <= 0.22 keyed coverage on absolute paths; 1.0.0 keys it on
+      // project-relative paths. `hasPath` resolves either form.
+      InputFile inputFile = fileSystem.inputFile(predicates.hasPath(filePath));
       if (inputFile != null) {
         try {
           saveNewCoverage(context, coverageForFile.getValue(), inputFile);
@@ -112,12 +114,17 @@ public class SimpleCovSensor implements Sensor {
     newCoverage.save();
   }
 
-  private static void mergeFileCoverages(Map<String, Map<Integer, Integer>> coveragePerFiles, Map<String, JSONObject> upperJsonObjects) {
+  private static void mergeFileCoverages(Map<String, Map<Integer, Integer>> coveragePerFiles, Map<String, Object> upperJsonObjects) {
     upperJsonObjects.forEach((key, value) -> {
-      if ("coverage".equals(key)) {
-        mergeFrameworkCoveragesFromJsonFormatter(coveragePerFiles, value);
+      if (!(value instanceof JSONObject valueObject)) {
+        // The SimpleCov JSON formatter emits scalar top-level entries from
+        // version 1.0.0 on (e.g. "$schema"); they carry no coverage data.
+        return;
       }
-      JSONObject testFrameworkCoverage = (JSONObject) value.get("coverage");
+      if ("coverage".equals(key)) {
+        mergeFrameworkCoveragesFromJsonFormatter(coveragePerFiles, valueObject);
+      }
+      JSONObject testFrameworkCoverage = (JSONObject) valueObject.get("coverage");
       if (testFrameworkCoverage != null) {
         LOG.warn("Importing SimpleCov resultset JSON will not be supported from simplecov 18.0. Consider using the JSON formatter, available from SimpleCov 20.0");
         mergeFrameworkCoveragesFromResultSet(coveragePerFiles, testFrameworkCoverage);

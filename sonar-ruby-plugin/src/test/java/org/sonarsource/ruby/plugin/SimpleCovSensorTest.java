@@ -112,6 +112,26 @@ class SimpleCovSensorTest {
   }
 
   @Test
+  void test_reportPath_property_JSON_formatter_1_0() throws IOException {
+    // SimpleCov 1.0.0 adds a scalar top-level "$schema" entry (previously
+    // every top-level value was an object) and keys per-file coverage on
+    // project-relative paths instead of absolute ones.
+    SensorContextTester context = getSensorContext("json_formatter_1_0.json", "file1.rb");
+    sensor.execute(context);
+
+    String fileKey = MODULE_KEY + ":file1.rb";
+    assertThat(context.lineHits(fileKey, 1)).isEqualTo(1);
+    assertThat(context.lineHits(fileKey, 2)).isEqualTo(1);
+    assertThat(context.lineHits(fileKey, 3)).isEqualTo(2);
+    assertThat(context.lineHits(fileKey, 4)).isNull();
+    assertThat(context.lineHits(fileKey, 5)).isNull();
+    assertThat(context.lineHits(fileKey, 6)).isEqualTo(1);
+    assertThat(context.lineHits(fileKey, 7)).isZero();
+
+    assertThat(logTester.logs()).isEmpty();
+  }
+
+  @Test
   void test_absolute_report_path() throws IOException {
     Path baseDir = COVERAGE_DIR.toAbsolutePath();
     Path reportPath = baseDir.resolve("resultset.json");
