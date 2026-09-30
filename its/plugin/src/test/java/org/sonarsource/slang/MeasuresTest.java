@@ -29,7 +29,7 @@ public class MeasuresTest extends TestBase {
   @Test
   public void ruby_measures() {
     final String projectKey = "rubyMeasures";
-    ORCHESTRATOR.executeBuild(getSonarScanner(projectKey, BASE_DIRECTORY, "ruby"));
+    ORCHESTRATOR.executeBuild(getSonarScanner(projectKey, BASE_DIRECTORY, "ruby", "Sonar way comprehensive"));
 
     final String componentKey = projectKey + ":file.rb";
     assertThat(getMeasureAsInt(projectKey, "files")).isEqualTo(2);
