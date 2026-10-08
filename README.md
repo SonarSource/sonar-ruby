@@ -15,7 +15,7 @@
 
 # SonarQube analyzer for Ruby
 
-This repository contains the SonarQube analyzer for Ruby. It uses the whitequark parser through JRuby to parse Ruby source and convert it for analysis; the documentation below is for developers working on the analyzer.
+This repository contains the SonarQube analyzer for Ruby.
 
 To learn more about Sonar’s Ruby analysis, visit the [Sonar website](https://www.sonarsource.com/knowledge/languages/ruby/).
 
