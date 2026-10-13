@@ -114,7 +114,7 @@ public class SlangRulingTest {
     orchestrator.getServer().provisionProject(projectKey, projectKey);
     orchestrator.getServer().associateProjectToQualityProfile(projectKey, "ruby", "rules");
 
-    File actualDirectory = FileLocation.of("build/actual/" + projectKey).getFile();
+    File actualDirectory = FileLocation.of("build/actual/" + project).getFile();
     actualDirectory.mkdirs();
 
     File litsDifferencesFile = FileLocation.of("build/" + projectKey + "-differences").getFile();
