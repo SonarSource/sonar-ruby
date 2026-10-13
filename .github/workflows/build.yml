@@ -8,11 +8,52 @@ on:
       - dogfood-*
   pull_request:
   workflow_dispatch:
+    inputs:
+      pr-number:
+        description: PR receiving the ruling report
+        type: string
+        default: ''
+      base-sha:
+        description: First parent of the tested PR merge, or tested branch commit
+        type: string
+        default: ''
+      head-sha:
+        description: Exact tested commit; empty runs a normal Build
+        type: string
+        default: ''
+      run-id:
+        description: Originating Build run ID
+        type: string
+        default: ''
+      run-attempt:
+        description: Originating Build run attempt
+        type: string
+        default: '1'
+      ruling-failed:
+        description: Apply saved generated ruling results
+        type: boolean
+        default: false
+      is-pull-request:
+        description: Tested commit is a synthetic PR merge
+        type: boolean
+        default: false
+      fix-pr-url:
+        description: Fix PR link
+        type: string
+        default: ''
+      target-ref:
+        description: Original branch tested by ruling
+        type: string
+        default: ''
+      results-artifact-name:
+        description: Exact saved generated-results artifact name
+        type: string
+        default: inherit
   schedule:
     - cron: "45 0 * * 1-5" # Run Mon-Fri at 0:45 AM UTC
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ inputs.head-sha && format('ruling-report-{0}-{1}-{2}-{3}', github.workflow, inputs.pr-number, inputs.head-sha, github.run_id) || format('{0}-{1}', github.workflow, github.event.pull_request.number || github.ref) }}
   cancel-in-progress: true
 
 env:
@@ -21,6 +62,7 @@ env:
 
 jobs:
   build:
+    if: github.event_name != 'workflow_dispatch' || inputs.head-sha == ''
     runs-on: github-ubuntu-latest-s  # Public repository runner
     name: Build
     permissions:
@@ -42,6 +84,16 @@ jobs:
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
           version: 2026.4.28
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Test ruling bot support with coverage
+        run: |
+          mkdir -p .github/build/ruling-bot
+          node --test --experimental-test-coverage \
+            --test-reporter=spec --test-reporter-destination=stdout \
+            --test-reporter=lcov --test-reporter-destination=.github/build/ruling-bot/lcov.info \
+            .github/scripts/ruling-json.test.cjs
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         id: build-step
         with:
@@ -50,6 +102,7 @@ jobs:
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
           use-develocity: ${{ env.USE_DEVELOCITY }}
           develocity-url: ${{ env.DEVELOCITY_URL }}
+          gradle-args: -Dsonar.javascript.lcov.reportPaths=.github/build/ruling-bot/lcov.info
 
   qa:
     needs: [build]
@@ -63,31 +116,20 @@ jobs:
       fail-fast: false
       matrix:
         # Plugin tests check API compatibility, so they should run against all supported versions.
-        # Ruling tests check only that the results of analysis have not changed,
-        # so one sonar.runtimeVersion is enough.
+        # Ruling tests run in the qa_ruling job.
         item:
-          - suite: "plugin"
-            sq_version: "DEV"
+          - sq_version: "DEV"
             is_nightly: ${{ github.event_name == 'schedule' }}
-          - suite: "plugin"
-            sq_version: "LATEST_RELEASE"
-          - suite: "ruling"
-            sq_version: "LATEST_RELEASE"
+          - sq_version: "LATEST_RELEASE"
         exclude:
           # DEV is tested only in nightly to reduce Repox usage
-          - item: { suite: "plugin", sq_version: "DEV", is_nightly: false }
+          - item: { sq_version: "DEV", is_nightly: false }
     env:
       BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - name: Initialize required shared build logic submodule
         run: git submodule update --init -- build-logic/common
-      - name: Initialize test sources submodule for ruling tests
-        if: ${{ matrix.item.suite == 'ruling' }}
-        run: git submodule update --init -- its/sources
-      - name: Remove kotlin ITs as they are not relevant for ruling tests (and cause issues with wrapper validation)
-        if: ${{ matrix.item.suite == 'ruling' }}
-        run: rm -r ./its/sources/kotlin
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
           cache_save: false
@@ -111,10 +153,9 @@ jobs:
       - name: Run QA Tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-          SUITE: ${{ matrix.item.suite }}
           SQ_VERSION: ${{ matrix.item.sq_version }}
         run: |
-          ./gradlew ":its:${SUITE}:test" "-P${SUITE}" \
+          ./gradlew ":its:plugin:test" "-Pplugin" \
             "-Dsonar.runtimeVersion=${SQ_VERSION}" \
             "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" \
             "-DbuildNumber=${BUILD_NUMBER}" \
@@ -123,16 +164,195 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
-          name: report-${{ matrix.item.suite }}-${{ matrix.item.sq_version }}
-          path: its/${{ matrix.item.suite }}/build/reports/tests
+          name: report-plugin-${{ matrix.item.sq_version }}
+          path: its/plugin/build/reports/tests
+
+  qa_ruling:
+    needs: [build]
+    if: ${{ needs.build.outputs.deployed }}
+    runs-on: github-ubuntu-latest-s  # Public repository runner
+    name: QA Ruling Tests
+    permissions:
+      id-token: write  # Required for Vault OIDC authentication
+      contents: read  # Required for repository access
+    outputs:
+      ruling-outcome: ${{ steps.ruling.outcome }}
+      ruling-results-saved: ${{ steps.save_ruling.outcome == 'success' }}
+      tested-base-sha: ${{ steps.tested_merge.outputs.base_sha }}
+      results-artifact-name: ${{ steps.ruling_artifact.outputs.name }}
+    env:
+      BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
+      # Ruling tests check only that the results of analysis have not changed,
+      # so one sonar.runtimeVersion is enough.
+      SQ_VERSION: LATEST_RELEASE
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          fetch-depth: 2
+      - name: Capture the tested PR base
+        id: tested_merge
+        if: github.event_name == 'pull_request'
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git rev-parse --verify 'HEAD^2^{commit}' > /dev/null
+          echo "base_sha=$(git rev-parse --verify 'HEAD^1^{commit}')" >> "$GITHUB_OUTPUT"
+      - name: Initialize required submodules
+        run: git submodule update --init -- build-logic/common its/sources
+      - name: Remove kotlin ITs as they are not relevant for ruling tests (and cause issues with wrapper validation)
+        run: rm -r ./its/sources/kotlin
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          cache_save: false
+          version: 2026.4.28
+      - name: Get GitHub Token for QA Licenses
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/licenses-ro token | GITHUB_TOKEN;
+      - name: Configure Gradle
+        uses: SonarSource/ci-github-actions/config-gradle@v1
+        with:
+          artifactory-reader-role: private-reader
+          use-develocity: ${{ env.USE_DEVELOCITY }}
+          develocity-url: ${{ env.DEVELOCITY_URL }}
+      - name: Orchestrator Cache
+        uses: ./.github/actions/orchestrator-cache
+        with:
+          sq-version: ${{ env.SQ_VERSION }}
+      - name: Run Ruling Tests
+        id: ruling
+        env:
+          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+        run: |
+          ./gradlew ":its:ruling:test" "-Pruling" \
+            "-Dsonar.runtimeVersion=${SQ_VERSION}" \
+            "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" \
+            "-DbuildNumber=${BUILD_NUMBER}" \
+            -Pqa --info --stacktrace --console plain --no-daemon --build-cache
+      - name: Name saved ruling results
+        id: ruling_artifact
+        if: always() && steps.ruling.outcome == 'failure'
+        run: echo "name=ruling-results-${GITHUB_RUN_ATTEMPT}" >> "$GITHUB_OUTPUT"
+      - name: Upload Test Results on Failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        with:
+          name: report-ruling-${{ env.SQ_VERSION }}
+          path: its/ruling/build/reports/tests
+      - name: Save generated ruling results
+        id: save_ruling
+        if: always() && steps.ruling.outcome == 'failure'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: ${{ steps.ruling_artifact.outputs.name }}
+          path: its/ruling/build/tmp/actual/
+          if-no-files-found: error
+
+  ruling_update_notify:
+    name: Ruling Update and Notify
+    needs: [qa_ruling]
+    if: >-
+      always() && !cancelled() &&
+      (needs.qa_ruling.outputs.ruling-outcome == 'success' || needs.qa_ruling.outputs.ruling-results-saved == 'true') &&
+      (github.event_name == 'pull_request' || github.ref_name == github.event.repository.default_branch) &&
+      (github.event_name != 'pull_request' ||
+        (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'))
+    concurrency:
+      group: ${{ github.event_name == 'pull_request' && format('ruling-bot-pr-{0}', github.event.pull_request.number) || format('ruling-bot-branch-{0}', github.ref_name) }}
+      cancel-in-progress: false
+      queue: max
+    runs-on: github-ubuntu-latest-s  # Public repository runner
+    timeout-minutes: 15
+    permissions:
+      contents: write  # Required to push the fix branch
+      pull-requests: write  # Required to create the fix PR and comment on the original PR
+      actions: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Download generated ruling results
+        if: needs.qa_ruling.outputs.ruling-results-saved == 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: ${{ needs.qa_ruling.outputs.results-artifact-name }}
+          path: its/ruling/build/tmp/actual/
+      - name: Update ruling and notify
+        id: ruling_update
+        uses: SonarSource/SonarJS/.github/actions/ruling_bot@37339e09f5811265043ba0ca797f927ac512c67e
+        with:
+          github-token: ${{ github.token }}
+          pr-number: ${{ github.event.pull_request.number || '' }}
+          tested-base-sha: ${{ needs.qa_ruling.outputs.tested-base-sha }}
+          ruling-failed: ${{ needs.qa_ruling.outputs.ruling-results-saved == 'true' }}
+          is-pull-request: ${{ github.event_name == 'pull_request' }}
+          target-ref: ${{ github.head_ref || github.ref_name }}
+          tested-head-sha: ${{ github.event.pull_request.head.sha || github.sha }}
+          results-artifact-name: ${{ needs.qa_ruling.outputs.results-artifact-name }}
+      - name: Record ruling report dispatch
+        if: always() && steps.ruling_update.outputs.report-requested == 'true'
+        run: echo 'Independent ruling report dispatch succeeded.'
+
+  ruling_diff_comment:
+    name: Ruling diff comment
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.head-sha != '') ||
+      (github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
+    runs-on: github-ubuntu-latest-s
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+    concurrency:
+      group: ${{ (github.event_name == 'pull_request' || inputs.is-pull-request) && format('ruling-bot-pr-{0}', inputs.pr-number || github.event.pull_request.number) || format('ruling-bot-branch-{0}', inputs.target-ref) }}
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: ${{ inputs.head-sha || github.sha }}
+          fetch-depth: 2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Test Ruby ruling JSON compatibility
+        run: node --test .github/scripts/ruling-json.test.cjs
+      - name: Report results from the tested tree
+        uses: SonarSource/SonarJS/.github/actions/ruling_bot/report@37339e09f5811265043ba0ca797f927ac512c67e
+        env:
+          NODE_OPTIONS: --require ${{ github.workspace }}/.github/scripts/ruling-json.cjs
+        with:
+          github-token: ${{ github.token }}
+          pr-number: ${{ inputs.pr-number || github.event.pull_request.number }}
+          base-sha: ${{ inputs.base-sha || '' }}
+          head-sha: ${{ inputs.head-sha || github.sha }}
+          run-id: ${{ inputs.run-id || '' }}
+          run-attempt: ${{ inputs.run-attempt || '1' }}
+          ruling-failed: ${{ inputs.ruling-failed || false }}
+          is-pull-request: ${{ github.event_name == 'pull_request' || inputs.is-pull-request }}
+          fix-pr-url: ${{ inputs.fix-pr-url || '' }}
+          target-ref: ${{ inputs.target-ref || github.head_ref }}
+          workflow-inputs: ${{ toJSON(inputs) }}
 
   promote:
     name: Promote
     needs:
       - build
       - qa
+      - qa_ruling
+      - ruling_update_notify
     runs-on: github-ubuntu-latest-s  # Public repository runner
-    if: ${{ needs.build.outputs.deployed }}
+    if: >-
+      always() && !cancelled() &&
+      needs.build.result == 'success' && needs.build.outputs.deployed == 'true' &&
+      needs.qa.result == 'success' && needs.qa_ruling.result == 'success' &&
+      (needs.ruling_update_notify.result == 'success' || needs.ruling_update_notify.result == 'skipped')
     permissions:
       id-token: write  # Required for Vault OIDC authentication
       contents: write  # Required for repository access and tagging
@@ -147,6 +367,8 @@ jobs:
     needs:
       - build
       - qa
+      - qa_ruling
+      - ruling_update_notify
     if: >-
       !cancelled() && failure() &&
       (github.ref_name == 'master' ||

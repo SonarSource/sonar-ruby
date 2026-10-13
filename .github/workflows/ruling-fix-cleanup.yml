@@ -1,0 +1,31 @@
+name: Close obsolete ruling fix PRs
+
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  cleanup:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: github-ubuntu-latest-s
+    timeout-minutes: 15
+    concurrency:
+      group: ruling-bot-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - uses: SonarSource/SonarJS/.github/actions/ruling_bot/cleanup@37339e09f5811265043ba0ca797f927ac512c67e
+        with:
+          github-token: ${{ github.token }}
+          pr-number: ${{ github.event.pull_request.number }}
+          target-ref: ${{ github.event.pull_request.head.ref }}
