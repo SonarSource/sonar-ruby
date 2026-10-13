@@ -337,7 +337,11 @@ jobs:
       - qa_ruling
       - ruling_update_notify
     runs-on: github-ubuntu-latest-s  # Public repository runner
-    if: ${{ needs.build.outputs.deployed }}
+    if: >-
+      always() && !cancelled() &&
+      needs.build.result == 'success' && needs.build.outputs.deployed == 'true' &&
+      needs.qa.result == 'success' && needs.qa_ruling.result == 'success' &&
+      (needs.ruling_update_notify.result == 'success' || needs.ruling_update_notify.result == 'skipped')
     permissions:
       id-token: write  # Required for Vault OIDC authentication
       contents: write  # Required for repository access and tagging
