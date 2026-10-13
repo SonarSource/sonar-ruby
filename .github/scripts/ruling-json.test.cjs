@@ -3,6 +3,16 @@ const test = require('node:test');
 const strictParse = JSON.parse;
 require('./ruling-json.cjs');
 
+test('Ruby ruling bot configuration matches the CI artifact layout', async () => {
+  const { rulingConfig } = await import('../ruling-bot.config.mjs');
+  assert.deepEqual(rulingConfig, {
+    'new-results-path': 'its/ruling/build/tmp/actual',
+    'old-results-path': 'its/ruling/src/test/resources/expected',
+    'sources-path': '',
+    'report-workflow': 'build.yml',
+  });
+});
+
 for (const text of ['null', '42', '"text"', '[1,2]', '{"run_id":42,"ok":true}']) {
   test(`strict JSON retains its behavior: ${text}`, () => {
     assert.deepEqual(JSON.parse(text), strictParse(text));

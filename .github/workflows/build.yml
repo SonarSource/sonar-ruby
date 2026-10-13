@@ -84,6 +84,16 @@ jobs:
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
           version: 2026.4.28
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Test ruling bot support with coverage
+        run: |
+          mkdir -p .github/build/ruling-bot
+          node --test --experimental-test-coverage \
+            --test-reporter=spec --test-reporter-destination=stdout \
+            --test-reporter=lcov --test-reporter-destination=.github/build/ruling-bot/lcov.info \
+            .github/scripts/ruling-json.test.cjs
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         id: build-step
         with:
@@ -92,6 +102,7 @@ jobs:
           artifactory-deployer-role: qa-deployer     # Override for public repo using private access
           use-develocity: ${{ env.USE_DEVELOCITY }}
           develocity-url: ${{ env.DEVELOCITY_URL }}
+          gradle-args: -Dsonar.javascript.lcov.reportPaths=.github/build/ruling-bot/lcov.info
 
   qa:
     needs: [build]
