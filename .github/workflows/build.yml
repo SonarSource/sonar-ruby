@@ -63,31 +63,20 @@ jobs:
       fail-fast: false
       matrix:
         # Plugin tests check API compatibility, so they should run against all supported versions.
-        # Ruling tests check only that the results of analysis have not changed,
-        # so one sonar.runtimeVersion is enough.
+        # Ruling tests run in the qa_ruling job.
         item:
-          - suite: "plugin"
-            sq_version: "DEV"
+          - sq_version: "DEV"
             is_nightly: ${{ github.event_name == 'schedule' }}
-          - suite: "plugin"
-            sq_version: "LATEST_RELEASE"
-          - suite: "ruling"
-            sq_version: "LATEST_RELEASE"
+          - sq_version: "LATEST_RELEASE"
         exclude:
           # DEV is tested only in nightly to reduce Repox usage
-          - item: { suite: "plugin", sq_version: "DEV", is_nightly: false }
+          - item: { sq_version: "DEV", is_nightly: false }
     env:
       BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - name: Initialize required shared build logic submodule
         run: git submodule update --init -- build-logic/common
-      - name: Initialize test sources submodule for ruling tests
-        if: ${{ matrix.item.suite == 'ruling' }}
-        run: git submodule update --init -- its/sources
-      - name: Remove kotlin ITs as they are not relevant for ruling tests (and cause issues with wrapper validation)
-        if: ${{ matrix.item.suite == 'ruling' }}
-        run: rm -r ./its/sources/kotlin
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
           cache_save: false
@@ -111,10 +100,9 @@ jobs:
       - name: Run QA Tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-          SUITE: ${{ matrix.item.suite }}
           SQ_VERSION: ${{ matrix.item.sq_version }}
         run: |
-          ./gradlew ":its:${SUITE}:test" "-P${SUITE}" \
+          ./gradlew ":its:plugin:test" "-Pplugin" \
             "-Dsonar.runtimeVersion=${SQ_VERSION}" \
             "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" \
             "-DbuildNumber=${BUILD_NUMBER}" \
@@ -123,14 +111,104 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
-          name: report-${{ matrix.item.suite }}-${{ matrix.item.sq_version }}
-          path: its/${{ matrix.item.suite }}/build/reports/tests
+          name: report-plugin-${{ matrix.item.sq_version }}
+          path: its/plugin/build/reports/tests
+
+  qa_ruling:
+    needs: [build]
+    if: ${{ needs.build.outputs.deployed }}
+    runs-on: github-ubuntu-latest-s  # Public repository runner
+    name: QA Ruling Tests
+    permissions:
+      id-token: write  # Required for Vault OIDC authentication
+      contents: read  # Required for repository access
+    outputs:
+      ruling-outcome: ${{ steps.ruling.outcome }}
+    env:
+      BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
+      # Ruling tests check only that the results of analysis have not changed,
+      # so one sonar.runtimeVersion is enough.
+      SQ_VERSION: LATEST_RELEASE
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - name: Initialize required submodules
+        run: git submodule update --init -- build-logic/common its/sources
+      - name: Remove kotlin ITs as they are not relevant for ruling tests (and cause issues with wrapper validation)
+        run: rm -r ./its/sources/kotlin
+      - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
+        with:
+          cache_save: false
+          version: 2026.4.28
+      - name: Get GitHub Token for QA Licenses
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/licenses-ro token | GITHUB_TOKEN;
+      - name: Configure Gradle
+        uses: SonarSource/ci-github-actions/config-gradle@v1
+        with:
+          artifactory-reader-role: private-reader
+          use-develocity: ${{ env.USE_DEVELOCITY }}
+          develocity-url: ${{ env.DEVELOCITY_URL }}
+      - name: Orchestrator Cache
+        uses: ./.github/actions/orchestrator-cache
+        with:
+          sq-version: ${{ env.SQ_VERSION }}
+      - name: Run Ruling Tests
+        id: ruling
+        env:
+          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+        run: |
+          ./gradlew ":its:ruling:test" "-Pruling" \
+            "-Dsonar.runtimeVersion=${SQ_VERSION}" \
+            "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" \
+            "-DbuildNumber=${BUILD_NUMBER}" \
+            -Pqa --info --stacktrace --console plain --no-daemon --build-cache
+      - name: Upload Test Results on Failure
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        with:
+          name: report-ruling-${{ env.SQ_VERSION }}
+          path: its/ruling/build/reports/tests
+      # Upload the actual results written to its/ruling/build/actual, consumed by ruling_update_notify
+      # to open a PR updating the expected files.
+      - name: Prepare ruling artifact
+        if: ${{ always() && steps.ruling.outcome == 'failure' }}
+        uses: SonarSource/core-languages-tooling-public/prepare-ruling-artifact@master
+
+  ruling_update_notify:
+    name: Ruling Update and Notify
+    needs: [qa_ruling]
+    # qa_ruling itself still fails on ruling differences, so run whenever the ruling step completed;
+    # when ruling passes, this closes any stale fix PR. Fork PRs get a read-only token, skip them.
+    if: >-
+      always() && !cancelled() &&
+      contains(fromJSON('["success", "failure"]'), needs.qa_ruling.outputs.ruling-outcome) &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: github-ubuntu-latest-s  # Public repository runner
+    timeout-minutes: 15
+    permissions:
+      contents: write  # Required to push the fix branch
+      pull-requests: write  # Required to create the fix PR and comment on the original PR
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          fetch-depth: 0
+      - name: Initialize test sources submodule for ruling diff snippets
+        if: ${{ needs.qa_ruling.outputs.ruling-outcome == 'failure' }}
+        run: git submodule update --init -- its/sources
+      - name: Update ruling and notify
+        uses: SonarSource/core-languages-tooling-public/ruling-update-and-notify@master
+        with:
+          ruling-failed: ${{ needs.qa_ruling.outputs.ruling-outcome == 'failure' }}
 
   promote:
     name: Promote
     needs:
       - build
       - qa
+      - qa_ruling
     runs-on: github-ubuntu-latest-s  # Public repository runner
     if: ${{ needs.build.outputs.deployed }}
     permissions:
@@ -147,6 +225,7 @@ jobs:
     needs:
       - build
       - qa
+      - qa_ruling
     if: >-
       !cancelled() && failure() &&
       (github.ref_name == 'master' ||
