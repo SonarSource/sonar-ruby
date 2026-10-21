@@ -65,6 +65,16 @@ You can also build and run only Ruling Tests using the `ruling` property:
 
     ./gradlew build -Pruling --info --no-daemon
 
+## Rule descriptions and metadata
+
+The committed files are the source of truth. Edit rule descriptions and metadata directly in:
+
+* [`sonar-ruby-plugin/src/main/resources/org/sonar/l10n/ruby/rules/ruby`](sonar-ruby-plugin/src/main/resources/org/sonar/l10n/ruby/rules/ruby): each Ruby rule has an HTML description and JSON metadata.
+* [`sonar-ruby-plugin/src/main/resources/org/sonar/l10n/ruby/rules/rubocop/rules.json`](sonar-ruby-plugin/src/main/resources/org/sonar/l10n/ruby/rules/rubocop/rules.json): RuboCop external-rule metadata, including descriptions.
+
+These files are maintained by hand and are not regenerated from RSPEC or rule-api.
+For RuboCop updates, follow the [manual refresh instructions](sonar-ruby-plugin/src/main/resources/org/sonar/l10n/ruby/rules/rubocop/README.md).
+
 
 ## License headers
 
