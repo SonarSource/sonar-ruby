@@ -48,6 +48,11 @@ No SonarSource repository credentials are required.
 ## Integration Tests
 
 By default, Integration Tests (ITs) are skipped during builds.
+The tests build the Ruby plugin locally and download SonarQube Community Build, SonarScanner,
+and the ruling-test plugin from Maven Central. No license or SonarSource credentials are required.
+`sonar.runtimeVersion` defaults to the latest Community Build release; set it to a published
+Community Build version to test another release, for example `-Dsonar.runtimeVersion=26.10.0.133078`.
+
 If you want to run them, you need first to retrieve the related projects which are used as input:
 
     git submodule update --init its/sources

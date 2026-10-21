@@ -16,10 +16,7 @@
  */
 package org.sonarsource.slang;
 
-import com.sonar.orchestrator.config.Configuration;
 import com.sonar.orchestrator.locator.FileLocation;
-import com.sonar.orchestrator.locator.Locators;
-import com.sonar.orchestrator.locator.MavenLocation;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -74,24 +71,9 @@ public class SonarLintIntegrationTest {
   private SonarLintBackendFixture.FakeSonarLintRpcClient client;
   private SonarLintTestRpcServer backend;
 
-  /**
-   * Initialize {@link #pluginPath}:
-   *  <ul>
-   *    <li>In local environment, use the plugin built on local machine.</li>
-   *    <li>In QA environment in CI, the plugin is downloaded using Maven coordinates.</li>
-   *  </ul>
-   */
   @BeforeAll
   static void initPluginLocation() {
-    String slangVersion = System.getProperty("slangVersion");
-
-    if (slangVersion != null && !slangVersion.isEmpty()) {
-      Locators locators = new Locators(Configuration.createEnv());
-      MavenLocation mavenLocation = MavenLocation.of("org.sonarsource.slang", "sonar-ruby-plugin", slangVersion);
-      pluginPath = locators.locate(mavenLocation).toPath();
-    } else {
-      pluginPath = FileLocation.byWildcardMavenFilename(new File("../../sonar-ruby-plugin/build/libs"), "sonar-ruby-plugin-*-all.jar").getFile().toPath();
-    }
+    pluginPath = FileLocation.byWildcardMavenFilename(new File("../../sonar-ruby-plugin/build/libs"), "sonar-ruby-plugin-*-all.jar").getFile().toPath();
   }
 
   @SonarLintTest

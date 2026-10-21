@@ -21,9 +21,7 @@ import com.sonar.orchestrator.junit4.OrchestratorRule;
 import com.sonar.orchestrator.junit4.OrchestratorRuleBuilder;
 import com.sonar.orchestrator.locator.FileLocation;
 import com.sonar.orchestrator.locator.Location;
-import com.sonar.orchestrator.locator.MavenLocation;
 import java.io.File;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -49,25 +47,15 @@ public class Tests {
     addRubyPlugin(orchestratorBuilder);
     ORCHESTRATOR = orchestratorBuilder
       .useDefaultAdminCredentialsForBuilds(true)
-      .setEdition(Edition.ENTERPRISE_LW)
-      .activateLicense()
+      .setEdition(Edition.COMMUNITY)
       .setSonarVersion(System.getProperty(SQ_VERSION_PROPERTY, DEFAULT_SQ_VERSION))
       .restoreProfileAtStartup(FileLocation.of("src/test/resources/nosonar-ruby.xml"))
       .build();
   }
 
   static void addRubyPlugin(OrchestratorRuleBuilder builder) {
-    String slangVersion = System.getProperty("slangVersion");
-
-    Location pluginLocation;
     String plugin = "sonar-ruby-plugin";
-    if (StringUtils.isEmpty(slangVersion)) {
-      // use the plugin that was built on local machine
-      pluginLocation = FileLocation.byWildcardMavenFilename(new File("../../" + plugin + "/build/libs"), plugin + "-*-all.jar");
-    } else {
-      // QA environment downloads the plugin built by the CI job
-      pluginLocation = MavenLocation.of("org.sonarsource.slang", plugin, slangVersion);
-    }
+    Location pluginLocation = FileLocation.byWildcardMavenFilename(new File("../../" + plugin + "/build/libs"), plugin + "-*-all.jar");
 
     builder.addPlugin(pluginLocation);
   }
