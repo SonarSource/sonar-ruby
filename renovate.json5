@@ -1,16 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  extends: [ "github>SonarSource/renovate-config:languages-team" ],
+  extends: [ "config:recommended" ],
   ignorePaths: [
     "its/test-plugin/**",
   ],
   packageRules: [
-    {
-      // Use semver range updates (not pinning) for SonarSource GitHub Actions.
-      matchManagers: [ "github-actions" ],
-      matchPackagePatterns: [ "^SonarSource/" ],
-      rangeStrategy: "replace"
-    },
     {
       matchPackageNames: [
           "org.sonarsource.api.plugin:sonar-plugin-api*"
