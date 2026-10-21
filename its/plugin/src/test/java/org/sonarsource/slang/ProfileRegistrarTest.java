@@ -21,11 +21,8 @@ import com.sonar.orchestrator.junit4.OrchestratorRule;
 import com.sonar.orchestrator.junit4.OrchestratorRuleBuilder;
 import com.sonar.orchestrator.locator.FileLocation;
 import com.sonar.orchestrator.locator.Location;
-import com.sonar.orchestrator.locator.MavenLocation;
 import java.io.File;
 import java.util.List;
-import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.sonarqube.ws.client.HttpConnector;
@@ -49,26 +46,14 @@ public class ProfileRegistrarTest {
     addTestPlugin(orchestratorBuilder);
     ORCHESTRATOR = orchestratorBuilder
       .useDefaultAdminCredentialsForBuilds(true)
-      .setEdition(Edition.ENTERPRISE_LW)
-      .activateLicense()
+      .setEdition(Edition.COMMUNITY)
       .setSonarVersion(System.getProperty("sonar.runtimeVersion", "LATEST_RELEASE"))
       .build();
   }
 
   private static void addRubyPlugin(OrchestratorRuleBuilder builder) {
-    String slangVersion = System.getProperty("slangVersion");
-
-    Location pluginLocation;
     String plugin = "sonar-ruby-plugin";
-    if (StringUtils.isEmpty(slangVersion)) {
-      // use the plugin that was built on local machine
-      pluginLocation = FileLocation.byWildcardMavenFilename(
-        new File("../../" + plugin + "/build/libs"),
-        plugin + "-*-all.jar");
-    } else {
-      // QA environment downloads the plugin built by the CI job
-      pluginLocation = MavenLocation.of("org.sonarsource.slang", plugin, slangVersion);
-    }
+    Location pluginLocation = FileLocation.byWildcardMavenFilename(new File("../../" + plugin + "/build/libs"), plugin + "-*-all.jar");
 
     builder.addPlugin(pluginLocation);
   }
@@ -89,23 +74,23 @@ public class ProfileRegistrarTest {
   }
 
   @Test
-  public void testPluginRegistersRuleInDefaultRubyProfile() {
+  public void testPluginRegistersRuleInBuiltInRubyProfile() {
     var wsClient = newWsClient();
     
-    // First, query the quality profiles to find the profile key for Ruby's "Sonar way" profile
+    // Newer Community Builds expose the original Sonar way profile as Sonar way comprehensive.
     var profileSearchRequest = new org.sonarqube.ws.client.qualityprofiles.SearchRequest()
       .setLanguage("ruby");
     
     var profileResponse = wsClient.qualityprofiles().search(profileSearchRequest);
     
     var rubyProfile = profileResponse.getProfilesList().stream()
-      .filter(profile -> "Sonar way".equals(profile.getName()) && profile.getIsBuiltIn())
+      .filter(profile -> List.of("Sonar way", "Sonar way comprehensive").contains(profile.getName()) && profile.getIsBuiltIn())
       .findFirst()
-      .orElseThrow(() -> new AssertionError("Built-in 'Sonar way' profile not found for Ruby language"));
+      .orElseThrow(() -> new AssertionError("Built-in Sonar way profile not found for Ruby language"));
     
     var profileKey = rubyProfile.getKey();
     
-    // Query the active rules in the built-in "Sonar way" profile for Ruby language using the profile key
+    // Query the active rules in the built-in Ruby profile.
     var rulesSearchRequest = new org.sonarqube.ws.client.rules.SearchRequest()
       .setLanguages(List.of("ruby"))
       .setQprofile(profileKey)
@@ -120,7 +105,7 @@ public class ProfileRegistrarTest {
       .toList();
 
     assertThat(testRules)
-      .as("Rule ruby-test:TEST001 should be registered in the default Ruby profile by TestProfileRegistrar")
+      .as("Rule ruby-test:TEST001 should be registered in the built-in Ruby profile by TestProfileRegistrar")
       .hasSize(1);
 
     var testRule = testRules.get(0);
