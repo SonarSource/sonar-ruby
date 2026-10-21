@@ -1,5 +1,8 @@
 ## Updating parser
 
-To upgrade the ruby parser, you need to update the parser library version in `build.gradle`,
-`RubyConverter.java` and update the ruby version in `whitequark_parser_init.rb`. 
-You can use this [commit](https://github.com/SonarSource/slang-enterprise/commit/87236667aadc59352f28af6e56a8424927508a3b) as an example.
+To upgrade the Ruby parser, update `rubygemsParserVersion` in [build.gradle](build.gradle),
+the parser library path in [RubyConverter.java](src/main/java/org/sonarsource/ruby/converter/RubyConverter.java),
+and the parser import in [whitequark_parser_init.rb](src/main/resources/whitequark_parser_init.rb).
+
+Follow the repository's [contribution instructions](../CONTRIBUTING.md) and run both unit and integration tests
+to check that the upgraded parser still produces the expected analysis results.

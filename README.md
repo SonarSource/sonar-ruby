@@ -1,25 +1,9 @@
-<!-- Sonar Marketing hosts these approved brand assets on its Kentico Kontent CDN (assets-eu-01.kc-usercontent.com). Shared URLs are intentional; consult Marketing before replacing them. -->
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://assets-eu-01.kc-usercontent.com/ef593040-b591-0198-9506-ed88b30bc023/a23fc7ba-23f0-489a-829d-ed88c0748521/Sonar_Logo_Dark%20Backgrounds.svg">
-    <img src="https://assets-eu-01.kc-usercontent.com/ef593040-b591-0198-9506-ed88b30bc023/82c13eba-d95c-4bb8-8007-7ce77c14e043/Sonar_Logo_Light%20Backgrounds.svg" alt="Sonar logo" width="400">
-  </picture>
-</p>
-
-[![Build Status](https://github.com/SonarSource/sonar-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SonarSource/sonar-ruby/actions/workflows/build.yml)
-[![Quality Gate Status](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-ruby&metric=alert_status&token=sqb_a78a1551add08b844fb442b01edcb5cc144ed1cb)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-ruby)
-[![Coverage](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-ruby&metric=coverage&token=sqb_a78a1551add08b844fb442b01edcb5cc144ed1cb)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-ruby)
-
-<!-- sonar-marketing:start -->
-<!-- Marketing maintains this section. For wording changes, consult the relevant Product Marketing Manager (PMM). Repository CODEOWNERS review accuracy and merge changes. -->
-
 # SonarQube analyzer for Ruby
 
-This repository contains the SonarQube analyzer for Ruby.
+[![Build Status](https://github.com/SonarQubeCommunity/sonar-ruby/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SonarQubeCommunity/sonar-ruby/actions/workflows/build.yml)
 
-To learn more about Sonar’s Ruby analysis, visit the [Sonar website](https://www.sonarsource.com/knowledge/languages/ruby/).
-
-<!-- sonar-marketing:end -->
+This repository contains the community-maintained SonarQube analyzer for Ruby, originally developed by SonarSource.
+Its home is [SonarQubeCommunity/sonar-ruby](https://github.com/SonarQubeCommunity/sonar-ruby).
 
 This is a developer documentation. If you want to analyze source code in SonarQube read the [analysis of Ruby documentation](https://docs.sonarqube.org/latest/analysis/languages/ruby/).
 
@@ -30,7 +14,13 @@ We use [whitequark parser](https://github.com/whitequark/parser) to parse the Ru
 
 ## Have questions or feedback?
 
-To provide feedback (request a feature, report a bug, etc.) use the [SonarQube Community Forum](https://community.sonarsource.com/). Please do not forget to specify the language, plugin version, and SonarQube version.
+Report bugs and request features in the [GitHub issue tracker](https://github.com/SonarQubeCommunity/sonar-ruby/issues).
+Include the plugin version, SonarQube version, and a minimal example when reporting a problem.
+For security vulnerabilities, follow [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow, validation, and license requirements.
 
 ## Building
 
@@ -88,8 +78,9 @@ Furthermore, there are files such as `package-info.java` and `module-info.java` 
 
 Copyright 2018-2026 SonarSource.
 
-SonarQube analyzers released after November 29, 2024, including patch fixes for prior versions,
-are published under the [Sonar Source-Available License Version 1 (SSALv1)](LICENSE).
+This project uses the [Sonar Source-Available License Version 1 (SSALv1)](LICENSE.txt).
+The move to SonarQubeCommunity does not change the license or the existing copyright notices.
+SSALv1 restricts use, including competing with SonarQube; review its terms before using or contributing to the project.
 
 See individual files for details that specify the license applicable to each file.
 Files subject to the SSALv1 will be noted in their headers.
