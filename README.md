@@ -36,9 +36,7 @@ To provide feedback (request a feature, report a bug, etc.) use the [SonarQube C
 
 ### Build
 
-Use JDK 17 or newer. Initialize the public shared build logic after cloning:
-
-    git submodule update --init -- build-logic/common
+Use JDK 17 or newer.
 
 Build and run Unit Tests:
 
