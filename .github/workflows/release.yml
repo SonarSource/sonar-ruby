@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '[0-9]*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - name: Validate release version
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          version=$(sed -n 's/^version=//p' gradle.properties)
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$ || "$version" != "$RELEASE_VERSION" ]]; then
+            echo 'The tag must match the non-SNAPSHOT version in gradle.properties.' >&2
+            exit 1
+          fi
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> "$GITHUB_ENV"
+      - name: Initialize shared build logic
+        run: git submodule update --init -- build-logic/common
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build and run unit tests
+        run: ./gradlew build --no-daemon --console=plain
+      - name: Create draft GitHub release with the plugin JAR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          jar="sonar-ruby-plugin/build/libs/sonar-ruby-plugin-${RELEASE_VERSION}-all.jar"
+          test -s "$jar"
+          gh release create "$RELEASE_VERSION" "$jar" \
+            --verify-tag --draft --generate-notes --title "$RELEASE_VERSION"

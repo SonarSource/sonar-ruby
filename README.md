@@ -35,6 +35,27 @@ Build and run Unit Tests:
 Dependencies are downloaded from Maven Central, the Gradle Plugin Portal, and RubyGems.
 No SonarSource repository credentials are required.
 
+## Releases
+
+Releases are distributed as plugin JARs attached to [GitHub Releases](https://github.com/SonarQubeCommunity/sonar-ruby/releases).
+The Maven group ID remains `org.sonarsource.slang` for metadata continuity; releases do not publish to Repox or Artifactory.
+
+Maintainers can prepare a release as follows:
+
+1. Set `version` in `gradle.properties` to the release version without `-SNAPSHOT`, for example `1.26.0`.
+2. Merge the version change, then push a tag with the same version, for example `git tag 1.26.0` and `git push origin 1.26.0`.
+3. The [release workflow](.github/workflows/release.yml) validates the tag, builds the plugin, runs unit tests,
+   and creates a draft GitHub release with `sonar-ruby-plugin-<version>-all.jar` attached.
+   It uses public dependencies and the repository's `GITHUB_TOKEN` with `contents: write`; no publishing secrets are needed.
+4. Review the release notes and JAR before publishing the draft release. Agree on signing or checksum requirements
+   with the community maintainers before the first release; the workflow does not currently produce either.
+5. Update the Marketplace metadata in [sonar-update-center-properties](https://github.com/SonarSource/sonar-update-center-properties)
+   with the release date, download URL, and tested compatibility ranges. The download URL follows
+   `https://github.com/SonarQubeCommunity/sonar-ruby/releases/download/<version>/sonar-ruby-plugin-<version>-all.jar`.
+   Community Build compatibility must start at 26.11 or later, since earlier versions bundle a Ruby analyzer.
+   Only list Server versions that do not already provide an analyzer using the `ruby` language key.
+6. Set `version` to the next development version ending in `-SNAPSHOT`.
+
 ## Integration Tests
 
 By default, Integration Tests (ITs) are skipped during builds.
