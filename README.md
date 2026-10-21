@@ -35,9 +35,17 @@ To provide feedback (request a feature, report a bug, etc.) use the [SonarQube C
 ## Building
 
 ### Build
+
+Use JDK 17 or newer. Initialize the public shared build logic after cloning:
+
+    git submodule update --init -- build-logic/common
+
 Build and run Unit Tests:
 
     ./gradlew build
+
+Dependencies are downloaded from Maven Central, the Gradle Plugin Portal, and RubyGems.
+No SonarSource repository credentials are required.
 
 ## Integration Tests
 
