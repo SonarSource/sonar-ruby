@@ -28,6 +28,11 @@ We use [whitequark parser](https://github.com/whitequark/parser) to parse the Ru
 * AST documentation for the parser can be found [here](https://github.com/whitequark/parser/blob/master/doc/AST_FORMAT.md)
 * We use simple [Ruby script](sonar-ruby-plugin/src/main/resources/whitequark_parser_init.rb) to call the parser and invoke our [visitor](sonar-ruby-plugin/src/main/java/org/sonarsource/ruby/converter/RubyVisitor.java) written in Java
 
+## Rule metadata
+
+Native Ruby rule metadata is stored in [rules/ruby](sonar-ruby-plugin/src/main/resources/org/sonar/l10n/ruby/rules/ruby). Rule descriptions are stored as HTML files. Modify the corresponding file to update the description in SonarQube.
+To refresh RuboCop rule metadata, follow the [RuboCop generation instructions](utils/generate-rubocop-rules/README.md).
+
 ## Have questions or feedback?
 
 To provide feedback (request a feature, report a bug, etc.) use the [SonarQube Community Forum](https://community.sonarsource.com/). Please do not forget to specify the language, plugin version, and SonarQube version.
