@@ -19,9 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          submodules: true
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
         with:
           distribution: temurin
           java-version: '21'
-      - name: Build and run unit tests
-        run: ./gradlew build --no-daemon --console=plain
+      - name: Build and run unit and integration tests
+        run: ./gradlew build -Pits --no-daemon --console=plain

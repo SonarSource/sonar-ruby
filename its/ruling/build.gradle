@@ -17,5 +17,7 @@ test {
     }
 
     systemProperty 'java.awt.headless', 'true'
+    systemProperty 'orchestrator.artifactory.url', 'https://repo.maven.apache.org/maven2'
+    dependsOn ':sonar-ruby-plugin:shadowJar'
     outputs.upToDateWhen { false }
 }

@@ -21,9 +21,12 @@ test {
     }
     filter {
         includeTestsMatching 'org.sonarsource.slang.Tests'
+        includeTestsMatching 'org.sonarsource.slang.ProfileRegistrarTest'
         includeTestsMatching 'org.sonarsource.slang.SonarLintIntegrationTest'
     }
     systemProperty 'java.awt.headless', 'true'
+    systemProperty 'orchestrator.artifactory.url', 'https://repo.maven.apache.org/maven2'
+    dependsOn ':sonar-ruby-plugin:shadowJar'
     outputs.upToDateWhen { false }
     // Ensure test-plugin is built before running integration tests
     dependsOn ':its:test-plugin:build'

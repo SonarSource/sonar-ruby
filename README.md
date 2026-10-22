@@ -48,6 +48,7 @@ No SonarSource repository credentials are required.
 ## Integration Tests
 
 By default, Integration Tests (ITs) are skipped during builds.
+
 If you want to run them, you need first to retrieve the related projects which are used as input:
 
     git submodule update --init its/sources
@@ -55,6 +56,10 @@ If you want to run them, you need first to retrieve the related projects which a
 Then build and run the Integration Tests using the `its` property:
 
     ./gradlew build -Pits --info --no-daemon
+
+Run the integration tests with a specific version of the SonarQube Community Build:
+  
+    ./gradlew build -Pits --info --no-daemon -Dsonar.runtimeVersion=26.10.0.133078
 
 You can also build and run only Ruling Tests using the `ruling` property:
 
