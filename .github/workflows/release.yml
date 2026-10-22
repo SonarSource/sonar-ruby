@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          submodules: true
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build and run unit and integration tests
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a release tag such as v1.26.0, got: $TAG" >&2
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          ./gradlew clean build -Pits -Pversion="$VERSION" --no-daemon --console=plain
+      - name: Prepare the plugin JAR and checksum
+        run: |
+          mkdir -p build/release
+          cp "sonar-ruby-plugin/build/libs/sonar-ruby-plugin-$VERSION-all.jar" "build/release/sonar-ruby-plugin-$VERSION.jar"
+          cd build/release
+          sha256sum "sonar-ruby-plugin-$VERSION.jar" > "sonar-ruby-plugin-$VERSION.jar.sha256"
+      - name: Attach the plugin JAR and checksum to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" "build/release/sonar-ruby-plugin-$VERSION.jar" "build/release/sonar-ruby-plugin-$VERSION.jar.sha256"
