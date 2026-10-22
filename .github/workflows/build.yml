@@ -31,14 +31,6 @@ jobs:
       deployed: ${{ steps.build-step.outputs.deployed }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - name: Initialize required submodule only
-        # INVESTIGATION: Full submodule init pulls 'slang-test-sources', which contains
-        # invalid Gradle Wrapper JARs (checksum mismatch).
-        # The 'SonarSource/ci-github-actions/build-gradle@v1' action performs a strict
-        # wrapper verification that cannot be disabled or configured with an allow-list.
-        # Since this specific action is used here but not in QA (where full clones
-        # are safe), we isolate only 'build-logic/common' to pass CI validation.
-        run: git submodule update --init -- build-logic/common
       - uses: jdx/mise-action@5228313ee0372e111a38da051671ca30fc5a96db # v3.6.3
         with:
           version: 2026.4.28
@@ -80,8 +72,6 @@ jobs:
       BUILD_NUMBER: ${{ needs.build.outputs.build-number }}
     steps:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
-      - name: Initialize required shared build logic submodule
-        run: git submodule update --init -- build-logic/common
       - name: Initialize test sources submodule for ruling tests
         if: ${{ matrix.item.suite == 'ruling' }}
         run: git submodule update --init -- its/sources

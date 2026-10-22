@@ -16,8 +16,6 @@ jobs:
       - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
         with:
           version: 2026.4.25
-      - name: Initialize build-logic submodule
-        run: git submodule update --init build-logic/common
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         with:
           run-shadow-scans: true
