@@ -35,7 +35,7 @@ dependencyResolutionManagement {
             library("sonar-ws", "org.sonarsource.sonarqube", "sonar-ws").version(sonarqubeVersion)
             library("slang-antlr", "org.sonarsource.slang", "slang-antlr").version(slangDependenciesVersion)
             library("slang-testing", "org.sonarsource.slang", "slang-testing").version(slangDependenciesVersion)
-            library("mockito-core", "org.mockito", "mockito-core").version("5.23.0")
+            library("mockito-core", "org.mockito", "mockito-core").version("5.24.0")
             library("assertj-core", "org.assertj", "assertj-core").version("3.27.7")
             library("awaitility", "org.awaitility", "awaitility").version("4.3.0")
             library("junit-jupiter-api", "org.junit.jupiter", "junit-jupiter-api").version("6.0.3")
