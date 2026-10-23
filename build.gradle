@@ -26,8 +26,8 @@ allprojects {
     ext {
         buildNumber = System.getProperty("buildNumber")
 
-        sonarLinksCi = 'https://github.com/SonarSource/sonar-ruby/actions/workflows/build.yml'
-        sonarLinksScm = 'https://github.com/SonarSource/sonar-ruby'
+        sonarLinksCi = 'https://github.com/SonarQubeCommunity/sonar-ruby/actions/workflows/build.yml'
+        sonarLinksScm = 'https://github.com/SonarQubeCommunity/sonar-ruby'
     }
     // Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
     if (version.endsWith('-SNAPSHOT') && ext.buildNumber != null) {
@@ -128,7 +128,7 @@ subprojects {
                         }
                     }
                     scm {
-                        url = 'https://github.com/SonarSource/sonar-ruby'
+                        url = 'https://github.com/SonarQubeCommunity/sonar-ruby'
                     }
                     developers {
                         developer {
@@ -144,12 +144,12 @@ subprojects {
 
 sonar {
     properties {
-        property 'sonar.organization', 'sonarsource'
-        property 'sonar.projectKey', 'SonarSource_sonar-ruby'
+        property 'sonar.organization', 'sonarqubecommunity'
+        property 'sonar.projectKey', 'SonarQubeCommunity_sonar-ruby'
         property 'sonar.projectName', projectTitle
         property 'sonar.links.ci', "${sonarLinksCi}"
         property 'sonar.links.scm', "${sonarLinksScm}"
-        property 'sonar.links.issue', 'https://jira.sonarsource.com/browse/SONARRUBY'
+        property 'sonar.links.issue', 'https://github.com/SonarQubeCommunity/sonar-ruby/issues'
         property 'sonar.exclusions', '**/build/**/*'
         property 'sonar.coverage.exclusions', 'its/test-plugin/**/*'
     }
